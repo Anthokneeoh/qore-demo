@@ -148,6 +148,21 @@ router.post('/accounts', async (req, res) => {
     res.status(201).json(created);
 });
 
+// GET /v1/banks
+router.get('/banks', async (req, res) => {
+    const auth = await authenticate(req);
+    if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Invalid API key');
+
+    const banks = [
+        { code: '044', name: 'Access Bank' },
+        { code: '011', name: 'First Bank of Nigeria' },
+        { code: '058', name: 'Guaranty Trust Bank (GTBank)' },
+        { code: '033', name: 'United Bank for Africa (UBA)' },
+        { code: '050', name: 'Ecobank Nigeria' }
+    ];
+    res.json({ banks });
+});
+
 // POST /v1/transfers/name-enquiry
 router.post('/transfers/name-enquiry', async (req, res) => {
     const auth = await authenticate(req);
@@ -257,7 +272,7 @@ router.post('/transfers', async (req, res) => {
     res.status(202).json(responseBody);
 });
 
-// GET /v1/transfers
+// GET /v1/transfers (list)
 router.get('/transfers', async (req, res) => {
     const auth = await authenticate(req);
     if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Invalid API key');
@@ -268,7 +283,7 @@ router.get('/transfers', async (req, res) => {
     res.json({ data, meta: { total_count: data.length, has_more: false } });
 });
 
-// GET /v1/transfers/:id
+// GET /v1/transfers/:id (single)
 router.get('/transfers/:id', async (req, res) => {
     const auth = await authenticate(req);
     if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Invalid API key');
