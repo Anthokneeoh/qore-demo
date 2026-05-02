@@ -545,7 +545,7 @@
                 Async payments with webhook delivery.</p>
             <div class="base-url">
                 <span class="env-badge">SANDBOX</span>
-                <span id="baseUrl">https://sandbox.api.qore.dev/v1/</span>
+                <span id="baseUrl">https://qore-demo.vercel.app//</span>
                 <button class="copy-btn" onclick="copyText('baseUrl', this)">copy</button>
             </div>
             <div class="cta-row">
@@ -655,8 +655,8 @@
 
                 <div class="try-section">
                     <h5>🧪 Try it in Postman</h5>
-                    <p class="try-note">POST to <code>http://localhost:3000/v1/customers</code> with header
-                        <code>Authorization: Bearer sk_test_demo123abc</code> and an <code>Idempotency-Key</code> UUID.
+                    <p class="try-note">POST to <code>https://qore-demo.vercel.app/v1/customers</code> with header
+                        <code>Your Authorization: Bearer sk_test_xxxxxx</code> and an <code>Idempotency-Key</code> UUID.
                         Try submitting <code>08012345678</code> (without +234) to see the AI hint in action.
                     </p>
                 </div>
@@ -866,17 +866,17 @@
                     </tr>
                     <tr>
                         <td>2</td>
-                        <td>60 seconds</td>
+                        <td>15 seconds</td>
                         <td>5xx, 429, timeout</td>
                     </tr>
                     <tr>
                         <td>3</td>
-                        <td>5 minutes</td>
+                        <td>30 seconds</td>
                         <td>Same</td>
                     </tr>
                     <tr>
                         <td>4</td>
-                        <td>60 minutes</td>
+                        <td>60 seconds</td>
                         <td>Same</td>
                     </tr>
                     <tr>
