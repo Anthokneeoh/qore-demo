@@ -35,10 +35,12 @@
         }
 
         .topbar {
+            flex-wrap: wrap;
+            padding: 0 1rem;
+            height: auto;
+            gap: 0.5rem;
             background: var(--card);
             border-bottom: 1px solid var(--border);
-            padding: 0 2rem;
-            height: 56px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -63,25 +65,33 @@
         }
 
         .layout {
-            display: grid;
-            grid-template-columns: 220px 1fr;
-            min-height: calc(100vh - 56px);
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar {
+            width: 100%;
             background: var(--card);
-            border-right: 1px solid var(--border);
-            padding: 1.5rem 0;
+            border-right: none;
+            border-bottom: 1px solid var(--border);
+            padding: 0.5rem;
+            display: flex;
+            overflow-x: auto;
+            gap: 0.5rem;
+            white-space: nowrap;
         }
 
         .nav-item {
-            display: block;
-            padding: 0.5rem 1.5rem;
-            font-size: 0.875rem;
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-left: none;
+            border-radius: 20px;
+            font-size: 0.8rem;
             color: var(--muted);
             text-decoration: none;
-            border-left: 3px solid transparent;
             cursor: pointer;
+            background: transparent;
+            transition: all 0.15s;
         }
 
         .nav-item:hover {
@@ -91,23 +101,16 @@
 
         .nav-item.active {
             color: var(--green);
-            border-left-color: var(--green);
             background: var(--green-lt);
             font-weight: 600;
         }
 
         .nav-section {
-            padding: 0.75rem 1.5rem 0.25rem;
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--muted);
-            margin-top: 1rem;
+            display: none;
         }
 
         .content {
-            padding: 2rem;
+            padding: 1rem;
             overflow-y: auto;
         }
 
@@ -118,9 +121,9 @@
         }
 
         .stats-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
             margin-bottom: 2rem;
         }
 
@@ -163,6 +166,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         .card-title {
@@ -172,6 +177,7 @@
 
         .card-body {
             padding: 1.25rem;
+            overflow-x: auto;
         }
 
         /* Keys */
@@ -180,6 +186,7 @@
             align-items: center;
             gap: 0.75rem;
             margin-bottom: 0.75rem;
+            flex-wrap: wrap;
         }
 
         .key-type {
@@ -211,6 +218,7 @@
             border-radius: 6px;
             flex: 1;
             color: var(--text);
+            min-width: 180px;
         }
 
         .key-inactive {
@@ -262,6 +270,9 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
         }
 
         th {
@@ -327,8 +338,9 @@
         /* Webhook */
         .webhook-form {
             display: flex;
+            flex-direction: column;
+            align-items: stretch;
             gap: 0.75rem;
-            align-items: center;
         }
 
         .webhook-input {
@@ -338,6 +350,7 @@
             padding: 0.5rem 0.75rem;
             font-size: 0.875rem;
             background: var(--bg);
+            width: 100%;
         }
 
         .webhook-input:focus {
@@ -346,7 +359,7 @@
         }
 
         .feedback {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             padding: 0.5rem 0.75rem;
             border-radius: 6px;
             margin-top: 0.75rem;
@@ -364,6 +377,57 @@
 
         .amount-cell {
             font-family: 'IBM Plex Mono', monospace;
+        }
+
+        /* Desktop styles */
+        @media (min-width: 768px) {
+            .layout {
+                display: grid;
+                grid-template-columns: 220px 1fr;
+            }
+
+            .sidebar {
+                flex-direction: column;
+                overflow-x: visible;
+                white-space: normal;
+                padding: 1.5rem 0;
+                border-right: 1px solid var(--border);
+                border-bottom: none;
+            }
+
+            .nav-item {
+                display: block;
+                padding: 0.5rem 1.5rem;
+                border-radius: 0;
+                white-space: normal;
+            }
+
+            .nav-section {
+                display: block;
+                padding: 0.75rem 1.5rem 0.25rem;
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                color: var(--muted);
+                margin-top: 1rem;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .webhook-form {
+                flex-direction: row;
+            }
+
+            .content {
+                padding: 2rem;
+            }
+
+            .webhook-input {
+                width: auto;
+            }
         }
     </style>
 </head>
@@ -428,32 +492,36 @@
                     <div class="card-header"><span class="card-title">Recent Transactions</span></div>
                     <div class="card-body" style="padding:0">
                         <table>
-                            <tr>
-                                <th>ID</th>
-                                <th>Amount</th>
-                                <th>Destination</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                            </tr>
-                            <% transfers.slice(-5).reverse().forEach(t=> { %>
+                            <thead>
                                 <tr>
-                                    <td class="mono">
-                                        <%= t.id %>
-                                    </td>
-                                    <td class="amount-cell">NGN <%=
-                                            (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
-                                    </td>
-                                    <td class="mono">
-                                        <%= t.destination_account_number || '–' %>
-                                    </td>
-                                    <td><span class="status-pill s-<%= t.status %>">
-                                            <%= t.status %>
-                                        </span></td>
-                                    <td>
-                                        <%= new Date(t.created_at).toLocaleDateString() %>
-                                    </td>
+                                    <th>ID</th>
+                                    <th>Amount</th>
+                                    <th>Destination</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
                                 </tr>
-                                <% }) %>
+                            </thead>
+                            <tbody>
+                                <% transfers.slice(-5).reverse().forEach(t=> { %>
+                                    <tr>
+                                        <td class="mono">
+                                            <%= t.id %>
+                                        </td>
+                                        <td class="amount-cell">NGN <%=
+                                                (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
+                                        </td>
+                                        <td class="mono">
+                                            <%= t.destination_account_number || '–' %>
+                                        </td>
+                                        <td><span class="status-pill s-<%= t.status %>">
+                                                <%= t.status %>
+                                            </span></td>
+                                        <td>
+                                            <%= new Date(t.created_at).toLocaleDateString() %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -465,40 +533,44 @@
                 <div class="card">
                     <div class="card-body" style="padding:0">
                         <table>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Phone</th>
-                                <th>Email</th>
-                                <th>KYC Tier</th>
-                                <th>Status</th>
-                                <th>Created</th>
-                            </tr>
-                            <% customers.forEach(c=> { %>
+                            <thead>
                                 <tr>
-                                    <td class="mono">
-                                        <%= c.id %>
-                                    </td>
-                                    <td>
-                                        <%= c.first_name %>
-                                            <%= c.last_name %>
-                                    </td>
-                                    <td class="mono">
-                                        <%= c.phone_number %>
-                                    </td>
-                                    <td>
-                                        <%= c.email %>
-                                    </td>
-                                    <td style="text-align:center">
-                                        <%= c.kyc_tier %>
-                                    </td>
-                                    <td><span class="status-pill s-active">active</span></td>
-                                    <td>
-                                        <%= new Date(c.created_at).toLocaleDateString() %>
-                                    </td>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>KYC Tier</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
                                 </tr>
-                                <% }) %>
+                            </thead>
+                            <tbody>
+                                <% customers.forEach(c=> { %>
+                                    <tr>
+                                        <td class="mono">
+                                            <%= c.id %>
+                                        </td>
+                                        <td>
+                                            <%= c.first_name %>
+                                                <%= c.last_name %>
+                                        </td>
+                                        <td class="mono">
+                                            <%= c.phone_number %>
+                                        </td>
+                                        <td>
+                                            <%= c.email %>
+                                        </td>
+                                        <td style="text-align:center">
+                                            <%= c.kyc_tier %>
+                                        </td>
+                                        <td><span class="status-pill s-active">active</span></td>
+                                        <td>
+                                            <%= new Date(c.created_at).toLocaleDateString() %>
+                                        </td>
                         </table>
+                        <% }) %>
+                            </tbody>
+                            </table>
                     </div>
                 </div>
             </div>
@@ -509,36 +581,41 @@
                 <div class="card">
                     <div class="card-body" style="padding:0">
                         <table>
-                            <tr>
-                                <th>ID</th>
-                                <th>Account No.</th>
-                                <th>Customer ID</th>
-                                <th>Product</th>
-                                <th>Currency</th>
-                                <th>Status</th>
-                            </tr>
-                            <% accounts.forEach(a=> { %>
+                            <thead>
                                 <tr>
-                                    <td class="mono">
-                                        <%= a.id %>
-                                    </td>
-                                    <td class="mono">
-                                        <%= a.account_number %>
-                                    </td>
-                                    <td class="mono">
-                                        <%= a.customer_id %>
-                                    </td>
-                                    <td>
-                                        <%= a.product_code %>
-                                    </td>
-                                    <td>
-                                        <%= a.currency %>
-                                    </td>
-                                    <td><span class="status-pill s-<%= a.status === 'active' ? 'active' : 'pending' %>">
-                                            <%= a.status %>
-                                        </span></td>
+                                    <th>ID</th>
+                                    <th>Account No.</th>
+                                    <th>Customer ID</th>
+                                    <th>Product</th>
+                                    <th>Currency</th>
+                                    <th>Status</th>
                                 </tr>
-                                <% }) %>
+                            </thead>
+                            <tbody>
+                                <% accounts.forEach(a=> { %>
+                                    <tr>
+                                        <td class="mono">
+                                            <%= a.id %>
+                                        </td>
+                                        <td class="mono">
+                                            <%= a.account_number %>
+                                        </td>
+                                        <td class="mono">
+                                            <%= a.customer_id %>
+                                        </td>
+                                        <td>
+                                            <%= a.product_code %>
+                                        </td>
+                                        <td>
+                                            <%= a.currency %>
+                                        </td>
+                                        <td><span
+                                                class="status-pill s-<%= a.status === 'active' ? 'active' : 'pending' %>">
+                                                <%= a.status %>
+                                            </span></td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -550,45 +627,51 @@
                 <div class="card">
                     <div class="card-body" style="padding:0">
                         <table>
-                            <tr>
-                                <th>ID</th>
-                                <th>Amount (NGN)</th>
-                                <th>Destination</th>
-                                <th>Status</th>
-                                <th>Created</th>
-                                <th>Resend Webhook</th>
-                            </tr>
-                            <% transfers.forEach(t=> { %>
+                            <thead>
                                 <tr>
-                                    <td class="mono">
-                                        <%= t.id %>
-                                    </td>
-                                    <td class="amount-cell">
-                                        <%= (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
-                                    </td>
-                                    <td class="mono">
-                                        <%= t.destination_account_number || '–' %>
-                                    </td>
-                                    <td><span class="status-pill s-<%= t.status %>">
-                                            <%= t.status %>
-                                        </span></td>
-                                    <td>
-                                        <%= new Date(t.created_at).toLocaleDateString() %>
-                                    </td>
-                                    <td>
-                                        <% const log=webhookLog.find(l=> l.transferId === t.id); %>
-                                            <% if (log) { %>
-                                                <form method="POST"
-                                                    action="/dashboard/resend-webhook/<%= log.webhookId %>"
-                                                    style="display:inline">
-                                                    <button type="submit" class="btn btn-sm btn-ghost">↺ Resend</button>
-                                                </form>
-                                                <% } else { %>
-                                                    <span style="font-size:0.75rem;color:var(--muted)">No webhook</span>
-                                                    <% } %>
-                                    </td>
+                                    <th>ID</th>
+                                    <th>Amount (NGN)</th>
+                                    <th>Destination</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Resend Webhook</th>
                                 </tr>
-                                <% }) %>
+                            </thead>
+                            <tbody>
+                                <% transfers.forEach(t=> { %>
+                                    <tr>
+                                        <td class="mono">
+                                            <%= t.id %>
+                                        </td>
+                                        <td class="amount-cell">
+                                            <%= (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
+                                        </td>
+                                        <td class="mono">
+                                            <%= t.destination_account_number || '–' %>
+                                        </td>
+                                        <td><span class="status-pill s-<%= t.status %>">
+                                                <%= t.status %>
+                                            </span></td>
+                                        <td>
+                                            <%= new Date(t.created_at).toLocaleDateString() %>
+                                        </td>
+                                        <td>
+                                            <% const log=webhookLog.find(l=> l.transferId === t.id); %>
+                                                <% if (log) { %>
+                                                    <form method="POST"
+                                                        action="/dashboard/resend-webhook/<%= log.webhookId %>"
+                                                        style="display:inline">
+                                                        <button type="submit" class="btn btn-sm btn-ghost">↺
+                                                            Resend</button>
+                                                    </form>
+                                                    <% } else { %>
+                                                        <span style="font-size:0.75rem;color:var(--muted)">No
+                                                            webhook</span>
+                                                        <% } %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -666,38 +749,43 @@
                             </div>
                             <% } else { %>
                                 <table>
-                                    <tr>
-                                        <th>Event</th>
-                                        <th>URL</th>
-                                        <th>Status</th>
-                                        <th>Time</th>
-                                        <th>Resend</th>
-                                    </tr>
-                                    <% webhookLog.forEach(log=> { %>
+                                    <thead>
                                         <tr>
-                                            <td class="mono">
-                                                <%= log.event %>
-                                            </td>
-                                            <td class="mono"
-                                                style="max-width:200px;overflow:hidden;text-overflow:ellipsis">
-                                                <%= log.url %>
-                                            </td>
-                                            <td><span
-                                                    class="status-pill s-<%= log.status === 'delivered' ? 'success' : 'failed' %>">
-                                                    <%= log.status %>
-                                                </span></td>
-                                            <td>
-                                                <%= new Date(log.attemptedAt).toLocaleTimeString() %>
-                                            </td>
-                                            <td>
-                                                <form method="POST"
-                                                    action="/dashboard/resend-webhook/<%= log.webhookId %>"
-                                                    style="display:inline">
-                                                    <button type="submit" class="btn btn-sm btn-ghost">↺ Resend</button>
-                                                </form>
-                                            </td>
+                                            <th>Event</th>
+                                            <th>URL</th>
+                                            <th>Status</th>
+                                            <th>Time</th>
+                                            <th>Resend</th>
                                         </tr>
-                                        <% }) %>
+                                    </thead>
+                                    <tbody>
+                                        <% webhookLog.forEach(log=> { %>
+                                            <tr>
+                                                <td class="mono">
+                                                    <%= log.event %>
+                                                </td>
+                                                <td class="mono"
+                                                    style="max-width:200px;overflow:hidden;text-overflow:ellipsis">
+                                                    <%= log.url %>
+                                                </td>
+                                                <td><span
+                                                        class="status-pill s-<%= log.status === 'delivered' ? 'success' : 'failed' %>">
+                                                        <%= log.status %>
+                                                    </span></td>
+                                                <td>
+                                                    <%= new Date(log.attemptedAt).toLocaleTimeString() %>
+                                                </td>
+                                                <td>
+                                                    <form method="POST"
+                                                        action="/dashboard/resend-webhook/<%= log.webhookId %>"
+                                                        style="display:inline">
+                                                        <button type="submit" class="btn btn-sm btn-ghost">↺
+                                                            Resend</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
                                 </table>
                                 <% } %>
                     </div>

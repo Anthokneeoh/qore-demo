@@ -39,464 +39,187 @@
             background: var(--bg);
             color: var(--text);
             display: flex;
-            min-height: 100vh;
+            flex-direction: column;
         }
 
         /* Sidebar */
         .sidebar {
-            width: 260px;
-            min-height: 100vh;
+            width: 100%;
             background: var(--sidebar);
-            padding: 2rem 0;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-            flex-shrink: 0;
+            padding: 1rem;
+            position: relative;
+            height: auto;
+            overflow-x: auto;
+            white-space: nowrap;
+            display: flex;
+            gap: 1rem;
+            scrollbar-width: thin;
         }
 
         .sidebar-logo {
-            padding: 0 1.5rem 1.5rem;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #fff;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            margin-bottom: 1rem;
-        }
-
-        .sidebar-logo span {
-            color: var(--green-glow);
+            display: none;
+            /* hide logo in mobile bar */
         }
 
         .nav-section {
-            padding: 0.5rem 1.5rem 0.25rem;
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: rgba(255, 255, 255, 0.3);
-            margin-top: 1rem;
+            display: none;
+            /* sections take space, hide on mobile */
         }
 
         .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.45rem 1.5rem;
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.65);
-            text-decoration: none;
-            transition: all 0.15s;
-            cursor: pointer;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.06);
+            display: inline-flex;
+            padding: 0.4rem 0.8rem;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
 
         .nav-method {
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 0.1rem 0.4rem;
-            border-radius: 3px;
-            font-family: 'IBM Plex Mono', monospace;
-            min-width: 36px;
-            text-align: center;
-        }
-
-        .nav-post {
-            background: rgba(18, 163, 114, 0.25);
-            color: var(--green-glow);
-        }
-
-        .nav-get {
-            background: rgba(0, 119, 204, 0.25);
-            color: #4DB8FF;
+            margin-right: 0.3rem;
         }
 
         /* Main content */
         .main {
-            flex: 1;
-            max-width: 900px;
-            padding: 3rem 3rem 6rem;
-            overflow-y: auto;
-        }
-
-        .hero {
-            margin-bottom: 3rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            max-width: 100%;
+            overflow-x: auto;
         }
 
         .hero h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .hero h1 span {
-            color: var(--green);
-        }
-
-        .hero p {
-            color: var(--muted);
-            font-size: 1rem;
-            line-height: 1.6;
-            max-width: 600px;
+            font-size: 1.5rem;
         }
 
         .base-url {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: var(--code-bg);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius);
-            margin-top: 1.25rem;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.875rem;
-            color: var(--code-text);
-        }
-
-        .env-badge {
-            background: rgba(244, 164, 0, 0.15);
-            color: var(--accent);
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 0.15rem 0.5rem;
-            border-radius: 3px;
+            flex-wrap: wrap;
+            word-break: break-all;
         }
 
         .cta-row {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
         }
 
-        .btn-primary {
-            background: var(--green);
-            color: #fff;
-            padding: 0.6rem 1.25rem;
-            border-radius: var(--radius);
-            font-weight: 600;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: background 0.15s;
-        }
-
-        .btn-primary:hover {
-            background: var(--green-glow);
-        }
-
+        .btn-primary,
         .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 0.6rem 1.25rem;
-            border-radius: var(--radius);
-            font-weight: 500;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-
-        /* Auth section */
-        .auth-card {
-            background: var(--bg-alt);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .auth-card h3 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-
-        .auth-header {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.875rem;
-            background: var(--code-bg);
-            color: var(--code-text);
-            padding: 0.75rem 1rem;
-            border-radius: 6px;
-        }
-
-        .auth-note {
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-top: 0.75rem;
-        }
-
-        .auth-note code {
-            background: var(--green-lt);
-            color: var(--green);
-            padding: 0.1rem 0.3rem;
-            border-radius: 3px;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.8rem;
-        }
-
-        /* Endpoint card */
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin: 2.5rem 0 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--green-lt);
-            color: var(--green);
-        }
-
-        .endpoint-card {
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-
-        .endpoint-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.9rem 1rem;
-            background: var(--bg-alt);
-            cursor: pointer;
-            border-bottom: 1px solid var(--border);
-            user-select: none;
-        }
-
-        .endpoint-header:hover {
-            background: #EDF5F0;
-        }
-
-        .method-badge {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 0.25rem 0.6rem;
-            border-radius: 4px;
-            min-width: 50px;
             text-align: center;
-        }
-
-        .post-badge {
-            background: rgba(18, 163, 114, 0.12);
-            color: #0B6E4F;
-            border: 1px solid rgba(18, 163, 114, 0.2);
-        }
-
-        .get-badge {
-            background: rgba(0, 119, 204, 0.1);
-            color: #005EA3;
-            border: 1px solid rgba(0, 119, 204, 0.2);
-        }
-
-        .endpoint-path {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .endpoint-desc {
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-left: auto;
-        }
-
-        .badge-tag {
-            background: var(--green-lt);
-            color: var(--green);
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.15rem 0.5rem;
-            border-radius: 3px;
-        }
-
-        .endpoint-body {
-            padding: 1.25rem 1.5rem;
-            display: none;
-        }
-
-        .endpoint-body.open {
-            display: block;
-        }
-
-        .endpoint-body p {
-            font-size: 0.9rem;
-            color: var(--muted);
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-
-        .subsection {
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--muted);
-            margin: 1.25rem 0 0.5rem;
         }
 
         table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-        }
-
-        th {
-            text-align: left;
-            padding: 0.5rem 0.75rem;
-            background: var(--bg-alt);
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: var(--muted);
-            border-bottom: 1px solid var(--border);
-        }
-
-        td {
-            padding: 0.5rem 0.75rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        td code {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.8rem;
-            background: var(--green-lt);
-            color: var(--green);
-            padding: 0.1rem 0.35rem;
-            border-radius: 3px;
-        }
-
-        /* Code blocks */
-        .code-block {
-            position: relative;
-            background: var(--code-bg);
-            border-radius: 6px;
-            margin: 0.75rem 0 1rem;
-            overflow: hidden;
-        }
-
-        .code-label {
-            padding: 0.4rem 1rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.4);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            font-family: 'IBM Plex Mono', monospace;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .copy-btn {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.6rem;
-            background: rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'IBM Plex Mono', monospace;
-            transition: all 0.15s;
-        }
-
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-        }
-
-        .copy-btn.copied {
-            background: rgba(18, 163, 114, 0.2);
-            color: var(--green-glow);
-            border-color: var(--green-glow);
-        }
-
-        pre {
-            padding: 1rem;
+            display: block;
             overflow-x: auto;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 0.8rem;
-            line-height: 1.6;
-            color: var(--code-text);
-            margin: 0;
+            white-space: nowrap;
         }
 
-        /* Error table */
-        .error-row-4 {
-            background: rgba(220, 38, 38, 0.04);
+        .endpoint-header {
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
-        .error-row-5 {
-            background: rgba(234, 88, 12, 0.04);
+        .endpoint-body {
+            padding: 0.75rem;
         }
 
-        .status-code {
-            font-family: 'IBM Plex Mono', monospace;
-            font-weight: 700;
-        }
-
-        .s4xx {
-            color: #DC2626;
-        }
-
-        .s5xx {
-            color: #EA580C;
-        }
-
-        /* Try it section */
-        .try-section {
-            background: var(--green-lt);
-            border: 1px solid rgba(11, 110, 79, 0.2);
-            border-radius: var(--radius);
-            padding: 1rem 1.25rem;
+        .subsection {
             margin-top: 1rem;
         }
 
-        .try-section h5 {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--green);
-            margin-bottom: 0.5rem;
+        .code-block pre {
+            font-size: 0.7rem;
         }
 
-        .try-note {
-            font-size: 0.8rem;
-            color: var(--muted);
+        .webhook-form {
+            flex-direction: column;
+            align-items: stretch;
         }
 
-        .try-note a {
-            color: var(--green);
+        .webhook-input {
+            width: 100%;
         }
 
-        /* Footer */
-        .docs-footer {
-            margin-top: 4rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.8rem;
-            color: var(--muted);
-            text-align: center;
+        .key-row {
+            flex-wrap: wrap;
         }
 
-        .docs-footer code {
-            font-family: 'IBM Plex Mono', monospace;
-            background: var(--bg-alt);
-            padding: 0.15rem 0.4rem;
-            border-radius: 3px;
+        .key-val {
+            min-width: 180px;
         }
 
-        @media (max-width: 768px) {
+        .stats-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .layout {
+            grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .nav-item {
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        /* For larger screens, revert to side by side */
+        @media (min-width: 768px) {
+            body {
+                display: flex;
+                flex-direction: row;
+            }
+
             .sidebar {
-                display: none;
+                width: 260px;
+                flex-direction: column;
+                white-space: normal;
+                display: block;
+                position: sticky;
+                top: 0;
+                height: 100vh;
+                overflow-y: auto;
+                padding: 2rem 0;
+            }
+
+            .sidebar-logo {
+                display: block;
+            }
+
+            .nav-section {
+                display: block;
+            }
+
+            .nav-link {
+                display: flex;
+                background: transparent;
+                border-radius: 0;
+                padding: 0.45rem 1.5rem;
+                white-space: normal;
             }
 
             .main {
-                padding: 1.5rem;
+                flex: 1;
+                max-width: 900px;
+                padding: 3rem 3rem 6rem;
+            }
+
+            .cta-row {
+                flex-direction: row;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .layout {
+                grid-template-columns: 220px 1fr;
+            }
+
+            .webhook-form {
+                flex-direction: row;
             }
         }
     </style>
@@ -853,37 +576,37 @@
 }</pre>
                 </div>
                 <div class="subsection">Retry policy</div>
-                <table>
-                    <tr>
-                        <th>Attempt</th>
-                        <th>Delay</th>
-                        <th>Triggers on</th>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>Immediate</td>
-                        <td>–</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>15 seconds</td>
-                        <td>5xx, 429, timeout</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>30 seconds</td>
-                        <td>Same</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>60 seconds</td>
-                        <td>Same</td>
-                    </tr>
-                    <tr>
-                        <td>After 4</td>
-                        <td>Dead letter queue</td>
-                        <td>Manual replay in dashboard</td>
-                    </tr>
+                表
+                <tr>
+                    <th>Attempt</th>
+                    <th>Delay</th>
+                    <th>Triggers on</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Immediate</td>
+                    <td>–</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>15 seconds</td>
+                    <td>5xx, 429, timeout</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>30 seconds</td>
+                    <td>Same</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>60 seconds</td>
+                    <td>Same</td>
+                </tr>
+                <tr>
+                    <td>After 4</td>
+                    <td>Dead letter queue</td>
+                    <td>Manual replay in dashboard</td>
+                </tr>
                 </table>
                 <p style="margin-top:0.5rem;font-size:0.8rem;color:var(--muted)">4xx responses from integrator endpoint
                     are NOT retried — a misconfigured handler will not self-heal.</p>
