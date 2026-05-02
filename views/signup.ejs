@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Qore — Sign In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F6F9F7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #D8E8E0;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .logo span {
+            color: #12A372;
+        }
+
+        .sandbox {
+            text-align: center;
+            background: #FEF3C7;
+            color: #92400E;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.4rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #5A7566;
+            margin-bottom: 0.25rem;
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid #D8E8E0;
+            border-radius: 6px;
+            padding: 0.6rem 0.75rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0B6E4F;
+        }
+
+        button {
+            width: 100%;
+            background: #0B6E4F;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.7rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #12A372;
+        }
+
+        .note {
+            font-size: 0.75rem;
+            color: #5A7566;
+            text-align: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="logo">Qore <span>Integration Hub</span></div>
+        <div class="sandbox">SANDBOX ENVIRONMENT</div>
+        <form method="POST" action="/dashboard/login">
+            <label>Institution name</label>
+            <input type="text" name="institution" value="Demo Bank" required>
+            <label>Email address</label>
+            <input type="email" name="email" placeholder="you@example.com" required>
+            <button type="submit">Access Developer Dashboard →</button>
+        </form>
+        <p class="note">No password required in sandbox. This is a capstone demo environment.</p>
+    </div>
+</body>
+
+</html>

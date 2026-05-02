@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qore — Dashboard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --green: #0B6E4F;
+            --green-lt: #E6F5EE;
+            --green-glow: #12A372;
+            --bg: #F6F9F7;
+            --card: #FFFFFF;
+            --text: #0F1E16;
+            --muted: #5A7566;
+            --border: #D8E8E0;
+            --accent: #F4A400;
+            --red: #DC2626;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .topbar {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .logo span {
+            color: var(--green-glow);
+        }
+
+        .sandbox-badge {
+            background: rgba(244, 164, 0, 0.15);
+            color: var(--accent);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            min-height: calc(100vh - 56px);
+        }
+
+        .sidebar {
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 0;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            color: var(--muted);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        .nav-item.active {
+            color: var(--green);
+            border-left-color: var(--green);
+            background: var(--green-lt);
+            font-weight: 600;
+        }
+
+        .nav-section {
+            padding: 0.75rem 1.5rem 0.25rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-top: 1rem;
+        }
+
+        .content {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-num {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.25rem 0;
+        }
+
+        .stat-sub {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        /* Keys */
+        .key-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .key-type {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .key-test {
+            background: var(--green-lt);
+            color: var(--green);
+        }
+
+        .key-live {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .key-val {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            flex: 1;
+            color: var(--text);
+        }
+
+        .key-inactive {
+            opacity: 0.5;
+        }
+
+        .btn {
+            padding: 0.45rem 0.9rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--green-glow);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        .btn-ghost:hover {
+            color: var(--text);
+            border-color: #aaa;
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.65rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-danger {
+            background: #FEE2E2;
+            color: var(--red);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--muted);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+
+        .s-active {
+            background: var(--green-lt);
+            color: var(--green);
+        }
+
+        .s-pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .s-success {
+            background: var(--green-lt);
+            color: var(--green);
+        }
+
+        .s-failed {
+            background: #FEE2E2;
+            color: var(--red);
+        }
+
+        .s-processing {
+            background: #EFF6FF;
+            color: #1D4ED8;
+        }
+
+        .mono {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.78rem;
+        }
+
+        /* Webhook */
+        .webhook-form {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .webhook-input {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            background: var(--bg);
+        }
+
+        .webhook-input:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
+        .feedback {
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+        }
+
+        .feedback-ok {
+            background: var(--green-lt);
+            color: var(--green);
+        }
+
+        .feedback-err {
+            background: #FEE2E2;
+            color: var(--red);
+        }
+
+        .amount-cell {
+            font-family: 'IBM Plex Mono', monospace;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="logo">Qore <span>Integration Hub</span></div>
+        <div style="display:flex;align-items:center;gap:1rem">
+            <span class="sandbox-badge">SANDBOX</span>
+            <a href="/" style="font-size:0.85rem;color:var(--muted);text-decoration:none">← API Docs</a>
+        </div>
+    </div>
+
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="nav-section">Overview</div>
+            <a class="nav-item active" onclick="showSection('overview')">Dashboard</a>
+            <div class="nav-section">Data</div>
+            <a class="nav-item" onclick="showSection('customers')">Customers</a>
+            <a class="nav-item" onclick="showSection('accounts')">Accounts</a>
+            <a class="nav-item" onclick="showSection('transfers')">Transactions</a>
+            <div class="nav-section">Developer</div>
+            <a class="nav-item" onclick="showSection('developer')">API Keys</a>
+            <a class="nav-item" onclick="showSection('webhooks')">Webhooks</a>
+        </nav>
+
+        <main class="content">
+
+            <!-- OVERVIEW -->
+            <div id="section-overview">
+                <h1 class="page-title">Overview</h1>
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-label">Customers</div>
+                        <div class="stat-num">
+                            <%= customers.length %>
+                        </div>
+                        <div class="stat-sub">Registered entities</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Accounts</div>
+                        <div class="stat-num">
+                            <%= accounts.length %>
+                        </div>
+                        <div class="stat-sub">
+                            <%= accounts.filter(a=>a.status==='active').length %> active
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Transactions</div>
+                        <div class="stat-num">
+                            <%= transfers.length %>
+                        </div>
+                        <div class="stat-sub">
+                            <%= transfers.filter(t=>t.status==='success').length %> successful
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Recent Transactions</span></div>
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <tr>
+                                <th>ID</th>
+                                <th>Amount</th>
+                                <th>Destination</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                            <% transfers.slice(-5).reverse().forEach(t=> { %>
+                                <tr>
+                                    <td class="mono">
+                                        <%= t.id %>
+                                    </td>
+                                    <td class="amount-cell">NGN <%=
+                                            (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
+                                    </td>
+                                    <td class="mono">
+                                        <%= t.destination_account_number || '–' %>
+                                    </td>
+                                    <td><span class="status-pill s-<%= t.status %>">
+                                            <%= t.status %>
+                                        </span></td>
+                                    <td>
+                                        <%= new Date(t.created_at).toLocaleDateString() %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CUSTOMERS -->
+            <div id="section-customers" style="display:none">
+                <h1 class="page-title">Customers</h1>
+                <div class="card">
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>KYC Tier</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                            </tr>
+                            <% customers.forEach(c=> { %>
+                                <tr>
+                                    <td class="mono">
+                                        <%= c.id %>
+                                    </td>
+                                    <td>
+                                        <%= c.first_name %>
+                                            <%= c.last_name %>
+                                    </td>
+                                    <td class="mono">
+                                        <%= c.phone_number %>
+                                    </td>
+                                    <td>
+                                        <%= c.email %>
+                                    </td>
+                                    <td style="text-align:center">
+                                        <%= c.kyc_tier %>
+                                    </td>
+                                    <td><span class="status-pill s-active">active</span></td>
+                                    <td>
+                                        <%= new Date(c.created_at).toLocaleDateString() %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCOUNTS -->
+            <div id="section-accounts" style="display:none">
+                <h1 class="page-title">Accounts</h1>
+                <div class="card">
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <tr>
+                                <th>ID</th>
+                                <th>Account No.</th>
+                                <th>Customer ID</th>
+                                <th>Product</th>
+                                <th>Currency</th>
+                                <th>Status</th>
+                            </tr>
+                            <% accounts.forEach(a=> { %>
+                                <tr>
+                                    <td class="mono">
+                                        <%= a.id %>
+                                    </td>
+                                    <td class="mono">
+                                        <%= a.account_number %>
+                                    </td>
+                                    <td class="mono">
+                                        <%= a.customer_id %>
+                                    </td>
+                                    <td>
+                                        <%= a.product_code %>
+                                    </td>
+                                    <td>
+                                        <%= a.currency %>
+                                    </td>
+                                    <td><span class="status-pill s-<%= a.status === 'active' ? 'active' : 'pending' %>">
+                                            <%= a.status %>
+                                        </span></td>
+                                </tr>
+                                <% }) %>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRANSFERS -->
+            <div id="section-transfers" style="display:none">
+                <h1 class="page-title">Transactions</h1>
+                <div class="card">
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <tr>
+                                <th>ID</th>
+                                <th>Amount (NGN)</th>
+                                <th>Destination</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Resend Webhook</th>
+                            </tr>
+                            <% transfers.forEach(t=> { %>
+                                <tr>
+                                    <td class="mono">
+                                        <%= t.id %>
+                                    </td>
+                                    <td class="amount-cell">
+                                        <%= (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
+                                    </td>
+                                    <td class="mono">
+                                        <%= t.destination_account_number || '–' %>
+                                    </td>
+                                    <td><span class="status-pill s-<%= t.status %>">
+                                            <%= t.status %>
+                                        </span></td>
+                                    <td>
+                                        <%= new Date(t.created_at).toLocaleDateString() %>
+                                    </td>
+                                    <td>
+                                        <% const log=webhookLog.find(l=> l.transferId === t.id); %>
+                                            <% if (log) { %>
+                                                <form method="POST"
+                                                    action="/dashboard/resend-webhook/<%= log.webhookId %>"
+                                                    style="display:inline">
+                                                    <button type="submit" class="btn btn-sm btn-ghost">↺ Resend</button>
+                                                </form>
+                                                <% } else { %>
+                                                    <span style="font-size:0.75rem;color:var(--muted)">No webhook</span>
+                                                    <% } %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEVELOPER / API KEYS -->
+            <div id="section-developer" style="display:none">
+                <h1 class="page-title">API Keys</h1>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Your keys</span>
+                        <form method="POST" action="/dashboard/generate-key">
+                            <button type="submit" class="btn btn-ghost btn-sm">↺ Regenerate test key</button>
+                        </form>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">
+                            Only <strong>test keys</strong> (sk_test_) work in this sandbox environment.
+                            Live keys are shown for reference only and will return 401.
+                        </p>
+                        <% apiKeys.forEach(k=> { %>
+                            <div class="key-row">
+                                <span class="key-type <%= k.type === 'test' ? 'key-test' : 'key-live' %>">
+                                    <%= k.type %>
+                                </span>
+                                <input class="key-val <%= k.type !== 'test' ? 'key-inactive' : '' %>"
+                                    id="key-<%= k.type %>" value="<%= k.key %>" readonly>
+                                <button class="btn btn-ghost btn-sm"
+                                    onclick="copyKey('<%= k.type %>', this)">copy</button>
+                            </div>
+                            <% }) %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WEBHOOKS -->
+            <div id="section-webhooks" style="display:none">
+                <h1 class="page-title">Webhook Settings</h1>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Endpoint URL</span></div>
+                    <div class="card-body">
+                        <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">
+                            Qore sends <code>transfer.completed</code>, <code>transfer.failed</code>, and
+                            <code>account.activated</code> events to this URL.
+                            Use <a href="https://webhook.site" target="_blank"
+                                style="color:var(--green)">webhook.site</a> for testing.
+                        </p>
+                        <form method="POST" action="/dashboard/webhook" class="webhook-form">
+                            <input type="url" name="url" class="webhook-input"
+                                placeholder="https://webhook.site/your-unique-url" value="<%= webhookUrl %>">
+                            <button type="submit" class="btn btn-primary">Save URL</button>
+                            <% if (webhookUrl) { %>
+                                <button type="button" class="btn btn-ghost" onclick="copyWebhookUrl()">Copy</button>
+                                <% } %>
+                        </form>
+                        <% if (typeof query !=='undefined' && query.saved) { %>
+                            <div class="feedback feedback-ok">✓ Webhook URL saved successfully</div>
+                            <% } %>
+                                <% if (typeof query !=='undefined' && query.error) { %>
+                                    <div class="feedback feedback-err">✗ Invalid URL — must start with http:// or
+                                        https://</div>
+                                    <% } %>
+                                        <% if (typeof query !=='undefined' && query.resent) { %>
+                                            <div class="feedback feedback-ok">✓ Webhook resent successfully</div>
+                                            <% } %>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:1.5rem">
+                    <div class="card-header"><span class="card-title">Recent delivery attempts</span></div>
+                    <div class="card-body" style="padding:0">
+                        <% if (webhookLog.length===0) { %>
+                            <div style="padding:1.5rem;text-align:center;color:var(--muted);font-size:0.875rem">
+                                No webhook deliveries yet. Initiate a transfer to generate events.
+                            </div>
+                            <% } else { %>
+                                <table>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>URL</th>
+                                        <th>Status</th>
+                                        <th>Time</th>
+                                        <th>Resend</th>
+                                    </tr>
+                                    <% webhookLog.forEach(log=> { %>
+                                        <tr>
+                                            <td class="mono">
+                                                <%= log.event %>
+                                            </td>
+                                            <td class="mono"
+                                                style="max-width:200px;overflow:hidden;text-overflow:ellipsis">
+                                                <%= log.url %>
+                                            </td>
+                                            <td><span
+                                                    class="status-pill s-<%= log.status === 'delivered' ? 'success' : 'failed' %>">
+                                                    <%= log.status %>
+                                                </span></td>
+                                            <td>
+                                                <%= new Date(log.attemptedAt).toLocaleTimeString() %>
+                                            </td>
+                                            <td>
+                                                <form method="POST"
+                                                    action="/dashboard/resend-webhook/<%= log.webhookId %>"
+                                                    style="display:inline">
+                                                    <button type="submit" class="btn btn-sm btn-ghost">↺ Resend</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </table>
+                                <% } %>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function showSection(name) {
+            document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
+            document.getElementById('section-' + name).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function copyKey(type, btn) {
+            const input = document.getElementById('key-' + type);
+            navigator.clipboard.writeText(input.value).then(() => {
+                btn.textContent = 'copied!';
+                setTimeout(() => btn.textContent = 'copy', 2000);
+            });
+        }
+
+        function copyWebhookUrl() {
+            const input = document.querySelector('.webhook-input');
+            navigator.clipboard.writeText(input.value).then(() => {
+                alert('Webhook URL copied to clipboard');
+            });
+        }
+    </script>
+</body>
+
+</html>

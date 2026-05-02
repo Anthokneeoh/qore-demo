@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Vercel deployment cache
+.vercel/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+*.log
+
+# Local database files (if any)
+*.sqlite
+*.db
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# IDE folders (optional, but good practice)
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+tmp/

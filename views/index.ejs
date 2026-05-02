@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qore Integration Hub — API Reference</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FFFFFF;
+            --bg-alt: #F6F9F7;
+            --sidebar: #0D1F17;
+            --text: #0F1E16;
+            --muted: #5A7566;
+            --border: #D8E8E0;
+            --green: #0B6E4F;
+            --green-lt: #E6F5EE;
+            --green-glow: #12A372;
+            --accent: #F4A400;
+            --code-bg: #0D1F17;
+            --code-text: #A8F0C6;
+            --post: #12A372;
+            --get: #0077CC;
+            --radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background: var(--sidebar);
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-logo span {
+            color: var(--green-glow);
+        }
+
+        .nav-section {
+            padding: 0.5rem 1.5rem 0.25rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 1.5rem;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .nav-method {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'IBM Plex Mono', monospace;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .nav-post {
+            background: rgba(18, 163, 114, 0.25);
+            color: var(--green-glow);
+        }
+
+        .nav-get {
+            background: rgba(0, 119, 204, 0.25);
+            color: #4DB8FF;
+        }
+
+        /* Main content */
+        .main {
+            flex: 1;
+            max-width: 900px;
+            padding: 3rem 3rem 6rem;
+            overflow-y: auto;
+        }
+
+        .hero {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero h1 span {
+            color: var(--green);
+        }
+
+        .hero p {
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        .base-url {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            margin-top: 1.25rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--code-text);
+        }
+
+        .env-badge {
+            background: rgba(244, 164, 0, 0.15);
+            color: var(--accent);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 3px;
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: #fff;
+            padding: 0.6rem 1.25rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.15s;
+        }
+
+        .btn-primary:hover {
+            background: var(--green-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.6rem 1.25rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        /* Auth section */
+        .auth-card {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .auth-card h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .auth-header {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.875rem;
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+        }
+
+        .auth-note {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.75rem;
+        }
+
+        .auth-note code {
+            background: var(--green-lt);
+            color: var(--green);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        /* Endpoint card */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--green-lt);
+            color: var(--green);
+        }
+
+        .endpoint-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.9rem 1rem;
+            background: var(--bg-alt);
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            user-select: none;
+        }
+
+        .endpoint-header:hover {
+            background: #EDF5F0;
+        }
+
+        .method-badge {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .post-badge {
+            background: rgba(18, 163, 114, 0.12);
+            color: #0B6E4F;
+            border: 1px solid rgba(18, 163, 114, 0.2);
+        }
+
+        .get-badge {
+            background: rgba(0, 119, 204, 0.1);
+            color: #005EA3;
+            border: 1px solid rgba(0, 119, 204, 0.2);
+        }
+
+        .endpoint-path {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .endpoint-desc {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        .badge-tag {
+            background: var(--green-lt);
+            color: var(--green);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.15rem 0.5rem;
+            border-radius: 3px;
+        }
+
+        .endpoint-body {
+            padding: 1.25rem 1.5rem;
+            display: none;
+        }
+
+        .endpoint-body.open {
+            display: block;
+        }
+
+        .endpoint-body p {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .subsection {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin: 1.25rem 0 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-alt);
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            background: var(--green-lt);
+            color: var(--green);
+            padding: 0.1rem 0.35rem;
+            border-radius: 3px;
+        }
+
+        /* Code blocks */
+        .code-block {
+            position: relative;
+            background: var(--code-bg);
+            border-radius: 6px;
+            margin: 0.75rem 0 1rem;
+            overflow: hidden;
+        }
+
+        .code-label {
+            padding: 0.4rem 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-family: 'IBM Plex Mono', monospace;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-btn {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            transition: all 0.15s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .copy-btn.copied {
+            background: rgba(18, 163, 114, 0.2);
+            color: var(--green-glow);
+            border-color: var(--green-glow);
+        }
+
+        pre {
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: var(--code-text);
+            margin: 0;
+        }
+
+        /* Error table */
+        .error-row-4 {
+            background: rgba(220, 38, 38, 0.04);
+        }
+
+        .error-row-5 {
+            background: rgba(234, 88, 12, 0.04);
+        }
+
+        .status-code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 700;
+        }
+
+        .s4xx {
+            color: #DC2626;
+        }
+
+        .s5xx {
+            color: #EA580C;
+        }
+
+        /* Try it section */
+        .try-section {
+            background: var(--green-lt);
+            border: 1px solid rgba(11, 110, 79, 0.2);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .try-section h5 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 0.5rem;
+        }
+
+        .try-note {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .try-note a {
+            color: var(--green);
+        }
+
+        /* Footer */
+        .docs-footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .docs-footer code {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--bg-alt);
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar nav -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">Qore <span>Integration Hub</span></div>
+        <div class="nav-section">Getting Started</div>
+        <a class="nav-link" onclick="scrollTo('auth')">Authentication</a>
+        <a class="nav-link" onclick="scrollTo('errors')">Error Handling</a>
+        <div class="nav-section">Endpoints</div>
+        <a class="nav-link" onclick="scrollTo('customers-post')">
+            <span class="nav-method nav-post">POST</span>/v1/customers
+        </a>
+        <a class="nav-link" onclick="scrollTo('customers-get')">
+            <span class="nav-method nav-get">GET</span>/v1/customers
+        </a>
+        <a class="nav-link" onclick="scrollTo('accounts-post')">
+            <span class="nav-method nav-post">POST</span>/v1/accounts
+        </a>
+        <a class="nav-link" onclick="scrollTo('name-enquiry')">
+            <span class="nav-method nav-post">POST</span>/v1/transfers/name-enquiry
+        </a>
+        <a class="nav-link" onclick="scrollTo('transfers-post')">
+            <span class="nav-method nav-post">POST</span>/v1/transfers
+        </a>
+        <a class="nav-link" onclick="scrollTo('transfers-get')">
+            <span class="nav-method nav-get">GET</span>/v1/transfers
+        </a>
+        <a class="nav-link" onclick="scrollTo('transfers-id')">
+            <span class="nav-method nav-get">GET</span>/v1/transfers/:id
+        </a>
+        <a class="nav-link" onclick="scrollTo('wallet')">
+            <span class="nav-method nav-get">GET</span>/v1/wallet-balance
+        </a>
+    </nav>
+
+    <!-- Main docs -->
+    <main class="main">
+        <div class="hero">
+            <h1>Qore <span>API Reference</span></h1>
+            <p>A standardized, self-serve API platform for African banking operations. Single base URL. RFC 9457 errors.
+                Async payments with webhook delivery.</p>
+            <div class="base-url">
+                <span class="env-badge">SANDBOX</span>
+                <span id="baseUrl">https://sandbox.api.qore.dev/v1/</span>
+                <button class="copy-btn" onclick="copyText('baseUrl', this)">copy</button>
+            </div>
+            <div class="cta-row">
+                <a href="/dashboard/login" class="btn-primary">Get your API key →</a>
+                <a href="/dashboard" class="btn-outline">View dashboard</a>
+            </div>
+        </div>
+
+        <!-- AUTH -->
+        <h2 class="section-title" id="auth">Authentication</h2>
+        <div class="auth-card">
+            <h3>Bearer token — all requests</h3>
+            <div class="auth-header" id="authHeader">Authorization: Bearer sk_test_xxxxxxxxxxxxxx</div>
+            <button class="copy-btn" style="margin-top:0.5rem" onclick="copyText('authHeader', this)">copy
+                header</button>
+            <p class="auth-note">
+                Sandbox keys start with <code>sk_test_</code> — safe-to-fail, rate-limited to 100 req/min.
+                Production keys (<code>sk_live_</code>) are inactive in sandbox and will return 401.
+                Get your key from the <a href="/dashboard">developer dashboard</a>.
+            </p>
+        </div>
+
+        <!-- ENDPOINTS -->
+        <h2 class="section-title" id="customers-post">Customers</h2>
+
+        <!-- POST /v1/customers -->
+        <div class="endpoint-card">
+            <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                <span class="method-badge post-badge">POST</span>
+                <span class="endpoint-path">/v1/customers</span>
+                <span class="badge-tag">Idempotency-Key required</span>
+                <span class="endpoint-desc">Create a customer entity</span>
+            </div>
+            <div class="endpoint-body open">
+                <p>Creates the customer identity record. All subsequent operations (accounts, transfers) require a valid
+                    <code>customer_id</code>. BVN, when provided, is validated asynchronously — customer creation
+                    returns 201 immediately.
+                </p>
+
+                <div class="subsection">Request headers</div>
+                <table>
+                    <tr>
+                        <th>Header</th>
+                        <th>Value</th>
+                        <th>Required</th>
+                    </tr>
+                    <tr>
+                        <td><code>Authorization</code></td>
+                        <td>Bearer sk_test_xxxxxx</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td><code>Idempotency-Key</code></td>
+                        <td>UUID v4</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td><code>Content-Type</code></td>
+                        <td>application/json</td>
+                        <td>Yes</td>
+                    </tr>
+                </table>
+
+                <div class="subsection">Request body</div>
+                <div class="code-block">
+                    <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "first_name":    "Amara",
+  "last_name":     "Osei",
+  "phone_number":  "+2348012345678",
+  "email":         "amara.osei@example.com",
+  "date_of_birth": "1990-04-15",
+  "bvn":           "22412345678"
+}</pre>
+                </div>
+
+                <div class="subsection">Response — 201 Created</div>
+                <div class="code-block">
+                    <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "id":           "cus_a1b2c3d4",
+  "status":       "active",
+  "first_name":   "Amara",
+  "last_name":    "Osei",
+  "phone_number": "+2348012345678",
+  "email":        "amara.osei@example.com",
+  "kyc_tier":     2,
+  "created_at":   "2026-05-01T10:00:00Z"
+}</pre>
+                </div>
+
+                <div class="subsection">Error response (with AI hint)</div>
+                <div class="code-block">
+                    <div class="code-label">400 Invalid Request <button class="copy-btn"
+                            onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "type":       "https://api.qore.dev/errors/invalid-request",
+  "title":      "Invalid Request",
+  "status":     400,
+  "detail":     "Phone number must be E.164 format for Nigeria: +234XXXXXXXXXX",
+  "field":      "phone_number",
+  "request_id": "req_a1b2c3d4",
+  "timestamp":  "2026-05-01T10:00:00Z",
+  "ai_hint":    "Nigerian numbers: remove the leading 0, add +234. Example: 08012345678 → +2348012345678"
+}</pre>
+                </div>
+
+                <div class="try-section">
+                    <h5>🧪 Try it in Postman</h5>
+                    <p class="try-note">POST to <code>http://localhost:3000/v1/customers</code> with header
+                        <code>Authorization: Bearer sk_test_demo123abc</code> and an <code>Idempotency-Key</code> UUID.
+                        Try submitting <code>08012345678</code> (without +234) to see the AI hint in action.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- GET /v1/customers -->
+        <div class="endpoint-card" id="customers-get">
+            <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                <span class="method-badge get-badge">GET</span>
+                <span class="endpoint-path">/v1/customers</span>
+                <span class="endpoint-desc">List all customers</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Returns all customers for the authenticated institution. Supports optional filtering by
+                    <code>email</code> or <code>phone</code> query params.
+                </p>
+                <div class="subsection">Query parameters</div>
+                <table>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><code>email</code></td>
+                        <td>string</td>
+                        <td>Filter by exact email match</td>
+                    </tr>
+                    <tr>
+                        <td><code>phone</code></td>
+                        <td>string</td>
+                        <td>Filter by exact phone number (E.164)</td>
+                    </tr>
+                </table>
+                <div class="subsection">Response — 200 OK</div>
+                <div class="code-block">
+                    <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "data": [
+    { "id": "cus_111", "first_name": "Amara", "last_name": "Osei", "kyc_tier": 2, "status": "active" }
+  ],
+  "meta": { "total_count": 1, "has_more": false }
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- POST /v1/accounts -->
+        <h2 class="section-title" id="accounts-post">Accounts</h2>
+        <div class="endpoint-card">
+            <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                <span class="method-badge post-badge">POST</span>
+                <span class="endpoint-path">/v1/accounts</span>
+                <span class="badge-tag">Idempotency-Key required</span>
+                <span class="endpoint-desc">Provision a bank account</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Links a customer to a banking product and generates a 10-digit NUBAN account number. Account starts
+                    as <code>pending_activation</code>. An <code>account.activated</code> webhook fires when KYC gate
+                    clears (simulated after ~4 seconds for KYC tier 2+ customers).</p>
+                <div class="subsection">Request body</div>
+                <div class="code-block">
+                    <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "customer_id":   "cus_a1b2c3d4",
+  "product_code":  "SAVINGS_BASIC",
+  "currency":      "NGN",
+  "initial_deposit": 0
+}</pre>
+                </div>
+                <div class="subsection">Response — 201 Created</div>
+                <div class="code-block">
+                    <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "id":             "acc_b2c3d4e5",
+  "account_number": "3047291856",
+  "status":         "pending_activation",
+  "product_code":   "SAVINGS_BASIC",
+  "currency":       "NGN",
+  "customer_id":    "cus_a1b2c3d4",
+  "created_at":     "2026-05-01T10:05:00Z"
+}</pre>
+                </div>
+                <div class="subsection">Valid product codes</div>
+                <table>
+                    <tr>
+                        <th>Code</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><code>SAVINGS_BASIC</code></td>
+                        <td>Basic savings account</td>
+                    </tr>
+                    <tr>
+                        <td><code>SAVINGS_PREMIUM</code></td>
+                        <td>Premium savings with higher limits</td>
+                    </tr>
+                    <tr>
+                        <td><code>CURRENT</code></td>
+                        <td>Current / business account</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Transfers -->
+        <h2 class="section-title" id="name-enquiry">Transfers</h2>
+
+        <!-- POST /v1/transfers/name-enquiry -->
+        <div class="endpoint-card">
+            <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                <span class="method-badge post-badge">POST</span>
+                <span class="endpoint-path">/v1/transfers/name-enquiry</span>
+                <span class="badge-tag">Pre-condition</span>
+                <span class="endpoint-desc">Verify destination account</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Must be called before initiating a transfer. Returns the account holder's name for end-user
+                    confirmation — a fraud prevention requirement.</p>
+                <div class="code-block">
+                    <div class="code-label">Request body <button class="copy-btn"
+                            onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "destination_bank_code":      "044",
+  "destination_account_number": "0123456789"
+}</pre>
+                </div>
+                <div class="code-block">
+                    <div class="code-label">200 OK <button class="copy-btn" onclick="copyBlock(this)">copy</button>
+                    </div>
+                    <pre>{
+  "account_name":   "Adeola Ogunlesi",
+  "bank_name":      "Access Bank",
+  "bank_code":      "044",
+  "account_number": "0123456789",
+  "verified_at":    "2026-05-01T10:09:00Z"
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- POST /v1/transfers -->
+        <div class="endpoint-card" id="transfers-post">
+            <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                <span class="method-badge post-badge">POST</span>
+                <span class="endpoint-path">/v1/transfers</span>
+                <span class="badge-tag">Async · Webhook delivery</span>
+                <span class="endpoint-desc">Initiate interbank transfer</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Returns <strong>202 Accepted</strong> immediately. Transfer is queued and processed asynchronously.
+                    Final status is delivered via webhook (<code>transfer.completed</code> or
+                    <code>transfer.failed</code>). Use GET /v1/transfers/:id to poll if webhooks are unavailable.
+                </p>
+                <p><strong>Amounts in kobo:</strong> 500000 = NGN 5,000.00</p>
+                <div class="subsection">Request body</div>
+                <div class="code-block">
+                    <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "source_account_id":          "acc_111",
+  "destination_bank_code":       "044",
+  "destination_account_number":  "0123456789",
+  "destination_account_name":    "Adeola Ogunlesi",
+  "amount":                      500000,
+  "currency":                    "NGN",
+  "narration":                   "Invoice #INV-2026-001"
+}</pre>
+                </div>
+                <div class="subsection">Response — 202 Accepted</div>
+                <div class="code-block">
+                    <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "transfer_id":          "trf_c3d4e5f6",
+  "status":               "processing",
+  "amount":               500000,
+  "currency":             "NGN",
+  "estimated_settlement": "2026-05-01T10:12:00Z"
+}</pre>
+                </div>
+                <div class="subsection">Webhook — transfer.completed</div>
+                <div class="code-block">
+                    <div class="code-label">Webhook payload <button class="copy-btn"
+                            onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "event":      "transfer.completed",
+  "webhook_id": "wh_d4e5f6g7",
+  "timestamp":  "2026-05-01T10:10:30Z",
+  "data": {
+    "transfer_id":          "trf_c3d4e5f6",
+    "status":               "success",
+    "settlement_reference": "STL-1746091830000"
+  }
+}</pre>
+                </div>
+                <div class="subsection">Retry policy</div>
+                <table>
+                    <tr>
+                        <th>Attempt</th>
+                        <th>Delay</th>
+                        <th>Triggers on</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Immediate</td>
+                        <td>–</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>60 seconds</td>
+                        <td>5xx, 429, timeout</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>5 minutes</td>
+                        <td>Same</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>60 minutes</td>
+                        <td>Same</td>
+                    </tr>
+                    <tr>
+                        <td>After 4</td>
+                        <td>Dead letter queue</td>
+                        <td>Manual replay in dashboard</td>
+                    </tr>
+                </table>
+                <p style="margin-top:0.5rem;font-size:0.8rem;color:var(--muted)">4xx responses from integrator endpoint
+                    are NOT retried — a misconfigured handler will not self-heal.</p>
+            </div>
+        </div>
+
+        <!-- GET /v1/transfers -->
+        <div class="endpoint-card" id="transfers-get">
+            <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                <span class="method-badge get-badge">GET</span>
+                <span class="endpoint-path">/v1/transfers</span>
+                <span class="endpoint-desc">List all transfers</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Returns all transfers. Filter by <code>account_id</code> or <code>status</code>.</p>
+                <div class="code-block">
+                    <div class="code-label">200 OK <button class="copy-btn" onclick="copyBlock(this)">copy</button>
+                    </div>
+                    <pre>{
+  "data": [ { "id": "trf_111", "status": "success", "amount": 500000, "currency": "NGN" } ],
+  "meta": { "total_count": 1, "has_more": false }
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GET /v1/transfers/:id -->
+        <div class="endpoint-card" id="transfers-id">
+            <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                <span class="method-badge get-badge">GET</span>
+                <span class="endpoint-path">/v1/transfers/:id</span>
+                <span class="badge-tag">TSQ fallback</span>
+                <span class="endpoint-desc">Poll transfer status</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Use when webhooks are unavailable. Poll every 60 seconds. After 5 polls with status
+                    <code>processing</code>, escalate to support with the <code>transfer_id</code>.
+                </p>
+                <div class="code-block">
+                    <div class="code-label">200 OK <button class="copy-btn" onclick="copyBlock(this)">copy</button>
+                    </div>
+                    <pre>GET /v1/transfers/trf_c3d4e5f6
+→ { "id": "trf_c3d4e5f6", "status": "success", "settlement_reference": "STL-..." }</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GET /v1/wallet-balance -->
+        <h2 class="section-title" id="wallet">Wallet Balance</h2>
+        <div class="endpoint-card">
+            <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                <span class="method-badge get-badge">GET</span>
+                <span class="endpoint-path">/v1/wallet-balance</span>
+                <span class="endpoint-desc">Get account balance</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Returns available and ledger balance for a given account in kobo. Sandbox accounts start with NGN
+                    100,000.00 seed balance.</p>
+                <div class="code-block">
+                    <div class="code-label">Request <button class="copy-btn" onclick="copyBlock(this)">copy</button>
+                    </div>
+                    <pre>GET /v1/wallet-balance?account_id=acc_111</pre>
+                </div>
+                <div class="code-block">
+                    <div class="code-label">200 OK <button class="copy-btn" onclick="copyBlock(this)">copy</button>
+                    </div>
+                    <pre>{
+  "account_id":                 "acc_111",
+  "account_number":             "1029384756",
+  "currency":                   "NGN",
+  "available_balance":          9500000,
+  "ledger_balance":             9500000,
+  "available_balance_formatted": "NGN 95,000.00",
+  "queried_at":                 "2026-05-01T10:15:00Z"
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ERROR REFERENCE -->
+        <h2 class="section-title" id="errors">Error Reference (RFC 9457)</h2>
+        <div class="endpoint-card">
+            <div class="endpoint-body open">
+                <p>All errors use the RFC 9457 Problem Details format. Every error includes a <code>request_id</code>
+                    for tracing. 4xx errors include an <code>ai_hint</code> field with a correction suggestion.</p>
+                <table>
+                    <tr>
+                        <th>Status</th>
+                        <th>Error type</th>
+                        <th>When</th>
+                    </tr>
+                    <tr class="error-row-4">
+                        <td class="status-code s4xx">400</td>
+                        <td><code>invalid-request</code></td>
+                        <td>Missing field, wrong type, format violation</td>
+                    </tr>
+                    <tr class="error-row-4">
+                        <td class="status-code s4xx">401</td>
+                        <td><code>unauthorized</code></td>
+                        <td>Missing or invalid API key (sk_live_ in sandbox)</td>
+                    </tr>
+                    <tr class="error-row-4">
+                        <td class="status-code s4xx">404</td>
+                        <td><code>not-found</code></td>
+                        <td>customer_id, account_id, or transfer_id not found</td>
+                    </tr>
+                    <tr class="error-row-4">
+                        <td class="status-code s4xx">409</td>
+                        <td><code>conflict</code></td>
+                        <td>Duplicate email/phone or idempotency key collision</td>
+                    </tr>
+                    <tr class="error-row-4">
+                        <td class="status-code s4xx">422</td>
+                        <td><code>unprocessable</code></td>
+                        <td>Business rule violation (frozen account, wrong product)</td>
+                    </tr>
+                    <tr class="error-row-4">
+                        <td class="status-code s4xx">429</td>
+                        <td><code>rate-limit-exceeded</code></td>
+                        <td>100 req/min sandbox limit exceeded</td>
+                    </tr>
+                    <tr class="error-row-5">
+                        <td class="status-code s5xx">503</td>
+                        <td><code>service-unavailable</code></td>
+                        <td>Downstream (NIBSS) unreachable — safe to retry</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="docs-footer">
+            <p>Base URL: <code>https://api.qore.dev/v1/</code> &nbsp;|&nbsp; Sandbox:
+                <code>https://sandbox.api.qore.dev/v1/</code>
+            </p>
+            <p style="margin-top:0.5rem">TLS 1.2+ required on all requests &nbsp;|&nbsp; Idempotency keys stored 24h
+                &nbsp;|&nbsp; Amounts in kobo (integer)</p>
+        </div>
+    </main>
+
+    <script>
+        function toggleEndpoint(header) {
+            const body = header.nextElementSibling;
+            body.classList.toggle('open');
+        }
+
+        function scrollTo(id) {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function copyText(id, btn) {
+            const text = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(text.trim()).then(() => {
+                btn.textContent = 'copied!';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+            });
+        }
+
+        function copyBlock(btn) {
+            const pre = btn.closest('.code-block').querySelector('pre');
+            navigator.clipboard.writeText(pre.textContent.trim()).then(() => {
+                btn.textContent = 'copied!';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
