@@ -42,6 +42,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 990;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .logo {
@@ -51,6 +60,28 @@
 
         .logo span {
             color: var(--green-glow);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text);
+            padding: 0;
+        }
+
+        .sidebar-close {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text);
+            position: absolute;
+            top: 1.25rem;
+            right: 1.5rem;
         }
 
         .sandbox-badge {
@@ -257,7 +288,6 @@
             color: var(--red);
         }
 
-        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -324,7 +354,6 @@
             font-size: 0.78rem;
         }
 
-        /* Webhook */
         .webhook-form {
             display: flex;
             gap: 0.75rem;
@@ -366,13 +395,13 @@
             font-family: 'IBM Plex Mono', monospace;
         }
 
-        /* ========== MOBILE RESPONSIVE (only affects screens <= 768px) ========== */
         @media (max-width: 768px) {
             .topbar {
                 padding: 0 1rem;
-                height: auto;
-                flex-wrap: wrap;
-                gap: 0.5rem;
+            }
+
+            .menu-toggle {
+                display: block;
             }
 
             .layout {
@@ -381,25 +410,29 @@
             }
 
             .sidebar {
-                width: 100%;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 280px;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                display: block;
+                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
                 border-right: none;
-                border-bottom: 1px solid var(--border);
-                padding: 0.5rem;
-                display: flex;
-                overflow-x: auto;
-                gap: 0.5rem;
-                white-space: nowrap;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .sidebar-close {
+                display: block;
             }
 
             .nav-item {
-                display: inline-block;
-                padding: 0.4rem 0.8rem;
-                border-left: none;
-                border-radius: 20px;
-            }
-
-            .nav-section {
-                display: none;
+                padding: 0.8rem 1.5rem;
+                border-radius: 0;
             }
 
             .content {
@@ -415,7 +448,6 @@
                 overflow-x: auto;
             }
 
-            /* Tables scroll horizontally on mobile */
             table {
                 display: block;
                 overflow-x: auto;
@@ -453,7 +485,10 @@
 <body>
 
     <div class="topbar">
-        <div class="logo">Qore <span>Integration Hub</span></div>
+        <div class="topbar-left">
+            <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+            <div class="logo">Qore <span>Integration Hub</span></div>
+        </div>
         <div style="display:flex;align-items:center;gap:1rem">
             <span class="sandbox-badge">SANDBOX</span>
             <a href="/" style="font-size:0.85rem;color:var(--muted);text-decoration:none">← API Docs</a>
@@ -462,15 +497,16 @@
 
     <div class="layout">
         <nav class="sidebar">
-            <div class="nav-section">Overview</div>
-            <a class="nav-item active" onclick="showSection('overview')">Dashboard</a>
+            <button class="sidebar-close" onclick="toggleMenu()">✕</button>
+            <div class="nav-section" style="margin-top: 2rem;">Overview</div>
+            <a class="nav-item active" onclick="showSection('overview', this)">Dashboard</a>
             <div class="nav-section">Data</div>
-            <a class="nav-item" onclick="showSection('customers')">Customers</a>
-            <a class="nav-item" onclick="showSection('accounts')">Accounts</a>
-            <a class="nav-item" onclick="showSection('transfers')">Transactions</a>
+            <a class="nav-item" onclick="showSection('customers', this)">Customers</a>
+            <a class="nav-item" onclick="showSection('accounts', this)">Accounts</a>
+            <a class="nav-item" onclick="showSection('transfers', this)">Transactions</a>
             <div class="nav-section">Developer</div>
-            <a class="nav-item" onclick="showSection('developer')">API Keys</a>
-            <a class="nav-item" onclick="showSection('webhooks')">Webhooks</a>
+            <a class="nav-item" onclick="showSection('developer', this)">API Keys</a>
+            <a class="nav-item" onclick="showSection('webhooks', this)">Webhooks</a>
         </nav>
 
         <main class="content">
@@ -814,11 +850,22 @@
     </div>
 
     <script>
-        function showSection(name) {
+        function toggleMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+        }
+
+        function showSection(name, element) {
             document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
             document.getElementById('section-' + name).style.display = 'block';
+
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            }
+
+            if (window.innerWidth <= 768) {
+                document.querySelector('.sidebar').classList.remove('open');
+            }
         }
 
         function copyKey(type, btn) {
