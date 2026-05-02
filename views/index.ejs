@@ -39,187 +39,560 @@
             background: var(--bg);
             color: var(--text);
             display: flex;
-            flex-direction: column;
+            min-height: 100vh;
         }
 
         /* Sidebar */
         .sidebar {
-            width: 100%;
+            width: 260px;
+            min-height: 100vh;
             background: var(--sidebar);
-            padding: 1rem;
-            position: relative;
-            height: auto;
-            overflow-x: auto;
-            white-space: nowrap;
-            display: flex;
-            gap: 1rem;
-            scrollbar-width: thin;
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .sidebar-logo {
-            display: none;
-            /* hide logo in mobile bar */
+            padding: 0 1.5rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-logo span {
+            color: var(--green-glow);
         }
 
         .nav-section {
-            display: none;
-            /* sections take space, hide on mobile */
+            padding: 0.5rem 1.5rem 0.25rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 1rem;
         }
 
         .nav-link {
-            display: inline-flex;
-            padding: 0.4rem 0.8rem;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            font-size: 0.75rem;
-            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 1.5rem;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
         }
 
         .nav-method {
-            margin-right: 0.3rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'IBM Plex Mono', monospace;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .nav-post {
+            background: rgba(18, 163, 114, 0.25);
+            color: var(--green-glow);
+        }
+
+        .nav-get {
+            background: rgba(0, 119, 204, 0.25);
+            color: #4DB8FF;
         }
 
         /* Main content */
         .main {
-            padding: 1rem;
-            max-width: 100%;
-            overflow-x: auto;
+            flex: 1;
+            max-width: 900px;
+            padding: 3rem 3rem 6rem;
+            overflow-y: auto;
+        }
+
+        .hero {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
         }
 
         .hero h1 {
-            font-size: 1.5rem;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero h1 span {
+            color: var(--green);
+        }
+
+        .hero p {
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.6;
+            max-width: 600px;
         }
 
         .base-url {
-            flex-wrap: wrap;
-            word-break: break-all;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            margin-top: 1.25rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--code-text);
+        }
+
+        .env-badge {
+            background: rgba(244, 164, 0, 0.15);
+            color: var(--accent);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 3px;
         }
 
         .cta-row {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0.5rem;
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
         }
 
-        .btn-primary,
+        .btn-primary {
+            background: var(--green);
+            color: #fff;
+            padding: 0.6rem 1.25rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.15s;
+        }
+
+        .btn-primary:hover {
+            background: var(--green-glow);
+        }
+
         .btn-outline {
-            text-align: center;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.6rem 1.25rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 0.9rem;
         }
 
-        table {
-            display: block;
-            overflow-x: auto;
-            white-space: nowrap;
+        /* Auth section */
+        .auth-card {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .auth-card h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .auth-header {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.875rem;
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+        }
+
+        .auth-note {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.75rem;
+        }
+
+        .auth-note code {
+            background: var(--green-lt);
+            color: var(--green);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        /* Endpoint card */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--green-lt);
+            color: var(--green);
+        }
+
+        .endpoint-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
         }
 
         .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.9rem 1rem;
+            background: var(--bg-alt);
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            user-select: none;
             flex-wrap: wrap;
-            gap: 0.5rem;
+        }
+
+        .endpoint-header:hover {
+            background: #EDF5F0;
+        }
+
+        .method-badge {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .post-badge {
+            background: rgba(18, 163, 114, 0.12);
+            color: #0B6E4F;
+            border: 1px solid rgba(18, 163, 114, 0.2);
+        }
+
+        .get-badge {
+            background: rgba(0, 119, 204, 0.1);
+            color: #005EA3;
+            border: 1px solid rgba(0, 119, 204, 0.2);
+        }
+
+        .endpoint-path {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .endpoint-desc {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        .badge-tag {
+            background: var(--green-lt);
+            color: var(--green);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.15rem 0.5rem;
+            border-radius: 3px;
         }
 
         .endpoint-body {
-            padding: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            display: none;
+        }
+
+        .endpoint-body.open {
+            display: block;
+        }
+
+        .endpoint-body p {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 1rem;
+            line-height: 1.6;
         }
 
         .subsection {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin: 1.25rem 0 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-alt);
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            background: var(--green-lt);
+            color: var(--green);
+            padding: 0.1rem 0.35rem;
+            border-radius: 3px;
+        }
+
+        /* Code blocks */
+        .code-block {
+            position: relative;
+            background: var(--code-bg);
+            border-radius: 6px;
+            margin: 0.75rem 0 1rem;
+            overflow: hidden;
+        }
+
+        .code-label {
+            padding: 0.4rem 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-family: 'IBM Plex Mono', monospace;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-btn {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            transition: all 0.15s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .copy-btn.copied {
+            background: rgba(18, 163, 114, 0.2);
+            color: var(--green-glow);
+            border-color: var(--green-glow);
+        }
+
+        pre {
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: var(--code-text);
+            margin: 0;
+        }
+
+        /* Error table */
+        .error-row-4 {
+            background: rgba(220, 38, 38, 0.04);
+        }
+
+        .error-row-5 {
+            background: rgba(234, 88, 12, 0.04);
+        }
+
+        .status-code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 700;
+        }
+
+        .s4xx {
+            color: #DC2626;
+        }
+
+        .s5xx {
+            color: #EA580C;
+        }
+
+        /* Try it section */
+        .try-section {
+            background: var(--green-lt);
+            border: 1px solid rgba(11, 110, 79, 0.2);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
             margin-top: 1rem;
         }
 
-        .code-block pre {
-            font-size: 0.7rem;
+        .try-section h5 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 0.5rem;
         }
 
-        .webhook-form {
-            flex-direction: column;
-            align-items: stretch;
+        .try-note {
+            font-size: 0.8rem;
+            color: var(--muted);
         }
 
-        .webhook-input {
-            width: 100%;
+        .try-note a {
+            color: var(--green);
         }
 
-        .key-row {
-            flex-wrap: wrap;
+        /* Footer */
+        .docs-footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-align: center;
         }
 
-        .key-val {
-            min-width: 180px;
+        .docs-footer code {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--bg-alt);
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
         }
 
-        .stats-row {
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-        }
-
-        .layout {
-            grid-template-columns: 1fr;
-        }
-
-        .sidebar {
-            display: flex;
-            overflow-x: auto;
-        }
-
-        .nav-item {
-            display: inline-block;
-            white-space: nowrap;
-        }
-
-        /* For larger screens, revert to side by side */
-        @media (min-width: 768px) {
+        /* ========== MOBILE RESPONSIVE (only affects screens <= 768px) ========== */
+        @media (max-width: 768px) {
             body {
-                display: flex;
-                flex-direction: row;
+                flex-direction: column;
             }
 
             .sidebar {
-                width: 260px;
-                flex-direction: column;
-                white-space: normal;
-                display: block;
-                position: sticky;
-                top: 0;
-                height: 100vh;
-                overflow-y: auto;
-                padding: 2rem 0;
+                width: 100%;
+                min-height: auto;
+                height: auto;
+                position: relative;
+                display: flex;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: 0.75rem;
+                gap: 0.5rem;
+                background: var(--sidebar);
             }
 
-            .sidebar-logo {
-                display: block;
-            }
-
+            .sidebar-logo,
             .nav-section {
-                display: block;
+                display: none;
             }
 
             .nav-link {
-                display: flex;
-                background: transparent;
-                border-radius: 0;
-                padding: 0.45rem 1.5rem;
-                white-space: normal;
+                display: inline-flex;
+                padding: 0.4rem 0.8rem;
+                background: rgba(255, 255, 255, 0.08);
+                border-radius: 20px;
+                white-space: nowrap;
             }
 
             .main {
-                flex: 1;
-                max-width: 900px;
-                padding: 3rem 3rem 6rem;
+                max-width: 100%;
+                padding: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .base-url {
+                flex-wrap: wrap;
+                word-break: break-all;
             }
 
             .cta-row {
-                flex-direction: row;
+                flex-direction: column;
+                align-items: stretch;
             }
 
-            .stats-row {
-                grid-template-columns: repeat(3, 1fr);
+            .btn-primary,
+            .btn-outline {
+                text-align: center;
             }
 
-            .layout {
-                grid-template-columns: 220px 1fr;
+            /* Tables become scrollable horizontally on mobile */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .endpoint-header {
+                flex-wrap: wrap;
+            }
+
+            .endpoint-body {
+                padding: 0.75rem;
+            }
+
+            .subsection {
+                margin-top: 1rem;
+            }
+
+            .code-block pre {
+                font-size: 0.7rem;
             }
 
             .webhook-form {
-                flex-direction: row;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .webhook-input {
+                width: 100%;
+            }
+
+            .key-row {
+                flex-wrap: wrap;
+            }
+
+            .key-val {
+                min-width: 180px;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-card {
+                padding: 1rem;
             }
         }
     </style>
@@ -307,31 +680,33 @@
                     <code>customer_id</code>. BVN, when provided, is validated asynchronously — customer creation
                     returns 201 immediately.
                 </p>
-
                 <div class="subsection">Request headers</div>
                 <table>
-                    <tr>
-                        <th>Header</th>
-                        <th>Value</th>
-                        <th>Required</th>
-                    </tr>
-                    <tr>
-                        <td><code>Authorization</code></td>
-                        <td>Bearer sk_test_xxxxxx</td>
-                        <td>Yes</td>
-                    </tr>
-                    <tr>
-                        <td><code>Idempotency-Key</code></td>
-                        <td>UUID v4</td>
-                        <td>Yes</td>
-                    </tr>
-                    <tr>
-                        <td><code>Content-Type</code></td>
-                        <td>application/json</td>
-                        <td>Yes</td>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Header</th>
+                            <th>Value</th>
+                            <th>Required</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>Authorization</code></td>
+                            <td>Bearer sk_test_xxxxxx</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td><code>Idempotency-Key</code></td>
+                            <td>UUID v4</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td><code>Content-Type</code></td>
+                            <td>application/json</td>
+                            <td>Yes</td>
+                        </tr>
+                    </tbody>
                 </table>
-
                 <div class="subsection">Request body</div>
                 <div class="code-block">
                     <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
@@ -344,7 +719,6 @@
   "bvn":           "22412345678"
 }</pre>
                 </div>
-
                 <div class="subsection">Response — 201 Created</div>
                 <div class="code-block">
                     <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
@@ -359,7 +733,6 @@
   "created_at":   "2026-05-01T10:00:00Z"
 }</pre>
                 </div>
-
                 <div class="subsection">Error response (with AI hint)</div>
                 <div class="code-block">
                     <div class="code-label">400 Invalid Request <button class="copy-btn"
@@ -375,11 +748,10 @@
   "ai_hint":    "Nigerian numbers: remove the leading 0, add +234. Example: 08012345678 → +2348012345678"
 }</pre>
                 </div>
-
                 <div class="try-section">
                     <h5>🧪 Try it in Postman</h5>
                     <p class="try-note">POST to <code>https://qore-demo.vercel.app/v1/customers</code> with header
-                        <code>Your Authorization: Bearer sk_test_xxxxxx</code> and an <code>Idempotency-Key</code> UUID.
+                        <code>Authorization: Bearer sk_test_xxxxxx</code> and an <code>Idempotency-Key</code> UUID.
                         Try submitting <code>08012345678</code> (without +234) to see the AI hint in action.
                     </p>
                 </div>
@@ -399,21 +771,25 @@
                 </p>
                 <div class="subsection">Query parameters</div>
                 <table>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                    <tr>
-                        <td><code>email</code></td>
-                        <td>string</td>
-                        <td>Filter by exact email match</td>
-                    </tr>
-                    <tr>
-                        <td><code>phone</code></td>
-                        <td>string</td>
-                        <td>Filter by exact phone number (E.164)</td>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>email</code></td>
+                            <td>string</td>
+                            <td>Filter by exact email match</td>
+                        </tr>
+                        <tr>
+                            <td><code>phone</code></td>
+                            <td>string</td>
+                            <td>Filter by exact phone number (E.164)</td>
+                        </tr>
+                    </tbody>
                 </table>
                 <div class="subsection">Response — 200 OK</div>
                 <div class="code-block">
@@ -466,22 +842,26 @@
                 </div>
                 <div class="subsection">Valid product codes</div>
                 <table>
-                    <tr>
-                        <th>Code</th>
-                        <th>Description</th>
-                    </tr>
-                    <tr>
-                        <td><code>SAVINGS_BASIC</code></td>
-                        <td>Basic savings account</td>
-                    </tr>
-                    <tr>
-                        <td><code>SAVINGS_PREMIUM</code></td>
-                        <td>Premium savings with higher limits</td>
-                    </tr>
-                    <tr>
-                        <td><code>CURRENT</code></td>
-                        <td>Current / business account</td>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>SAVINGS_BASIC</code></td>
+                            <td>Basic savings account</td>
+                        </tr>
+                        <tr>
+                            <td><code>SAVINGS_PREMIUM</code></td>
+                            <td>Premium savings with higher limits</td>
+                        </tr>
+                        <tr>
+                            <td><code>CURRENT</code></td>
+                            <td>Current / business account</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -576,37 +956,41 @@
 }</pre>
                 </div>
                 <div class="subsection">Retry policy</div>
-                表
-                <tr>
-                    <th>Attempt</th>
-                    <th>Delay</th>
-                    <th>Triggers on</th>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>Immediate</td>
-                    <td>–</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>15 seconds</td>
-                    <td>5xx, 429, timeout</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>30 seconds</td>
-                    <td>Same</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>60 seconds</td>
-                    <td>Same</td>
-                </tr>
-                <tr>
-                    <td>After 4</td>
-                    <td>Dead letter queue</td>
-                    <td>Manual replay in dashboard</td>
-                </tr>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Attempt</th>
+                            <th>Delay</th>
+                            <th>Triggers on</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Immediate</td>
+                            <td>–</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>15 seconds</td>
+                            <td>5xx, 429, timeout</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>30 seconds</td>
+                            <td>Same</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>60 seconds</td>
+                            <td>Same</td>
+                        </tr>
+                        <tr>
+                            <td>After 4</td>
+                            <td>Dead letter queue</td>
+                            <td>Manual replay in dashboard</td>
+                        </tr>
+                    </tbody>
                 </table>
                 <p style="margin-top:0.5rem;font-size:0.8rem;color:var(--muted)">4xx responses from integrator endpoint
                     are NOT retried — a misconfigured handler will not self-heal.</p>
@@ -693,52 +1077,56 @@
                 <p>All errors use the RFC 9457 Problem Details format. Every error includes a <code>request_id</code>
                     for tracing. 4xx errors include an <code>ai_hint</code> field with a correction suggestion.</p>
                 <table>
-                    <tr>
-                        <th>Status</th>
-                        <th>Error type</th>
-                        <th>When</th>
-                    </tr>
-                    <tr class="error-row-4">
-                        <td class="status-code s4xx">400</td>
-                        <td><code>invalid-request</code></td>
-                        <td>Missing field, wrong type, format violation</td>
-                    </tr>
-                    <tr class="error-row-4">
-                        <td class="status-code s4xx">401</td>
-                        <td><code>unauthorized</code></td>
-                        <td>Missing or invalid API key (sk_live_ in sandbox)</td>
-                    </tr>
-                    <tr class="error-row-4">
-                        <td class="status-code s4xx">404</td>
-                        <td><code>not-found</code></td>
-                        <td>customer_id, account_id, or transfer_id not found</td>
-                    </tr>
-                    <tr class="error-row-4">
-                        <td class="status-code s4xx">409</td>
-                        <td><code>conflict</code></td>
-                        <td>Duplicate email/phone or idempotency key collision</td>
-                    </tr>
-                    <tr class="error-row-4">
-                        <td class="status-code s4xx">422</td>
-                        <td><code>unprocessable</code></td>
-                        <td>Business rule violation (frozen account, wrong product)</td>
-                    </tr>
-                    <tr class="error-row-4">
-                        <td class="status-code s4xx">429</td>
-                        <td><code>rate-limit-exceeded</code></td>
-                        <td>100 req/min sandbox limit exceeded</td>
-                    </tr>
-                    <tr class="error-row-5">
-                        <td class="status-code s5xx">503</td>
-                        <td><code>service-unavailable</code></td>
-                        <td>Downstream (NIBSS) unreachable — safe to retry</td>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Error type</th>
+                            <th>When</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="error-row-4">
+                            <td class="status-code s4xx">400</td>
+                            <td><code>invalid-request</code></td>
+                            <td>Missing field, wrong type, format violation</td>
+                        </tr>
+                        <tr class="error-row-4">
+                            <td class="status-code s4xx">401</td>
+                            <td><code>unauthorized</code></td>
+                            <td>Missing or invalid API key (sk_live_ in sandbox)</td>
+                        </tr>
+                        <tr class="error-row-4">
+                            <td class="status-code s4xx">404</td>
+                            <td><code>not-found</code></td>
+                            <td>customer_id, account_id, or transfer_id not found</td>
+                        </tr>
+                        <tr class="error-row-4">
+                            <td class="status-code s4xx">409</td>
+                            <td><code>conflict</code></td>
+                            <td>Duplicate email/phone or idempotency key collision</td>
+                        </tr>
+                        <tr class="error-row-4">
+                            <td class="status-code s4xx">422</td>
+                            <td><code>unprocessable</code></td>
+                            <td>Business rule violation (frozen account, wrong product)</td>
+                        </tr>
+                        <tr class="error-row-4">
+                            <td class="status-code s4xx">429</td>
+                            <td><code>rate-limit-exceeded</code></td>
+                            <td>100 req/min sandbox limit exceeded</td>
+                        </tr>
+                        <tr class="error-row-5">
+                            <td class="status-code s5xx">503</td>
+                            <td><code>service-unavailable</code></td>
+                            <td>Downstream (NIBSS) unreachable — safe to retry</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
 
         <div class="docs-footer">
-            <p>Base URL: <code>https://qore-demo.vercel.app</code> &nbsp;|&nbsp; Sandbox:
+            <p>Base URL: <code>https://qore-demo.vercel.app/v1</code> &nbsp;|&nbsp; Sandbox:
                 <code>https://qore-demo.vercel.app</code>
             </p>
             <p style="margin-top:0.5rem">TLS 1.2+ required on all requests &nbsp;|&nbsp; Idempotency keys stored 24h

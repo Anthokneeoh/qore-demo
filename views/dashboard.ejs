@@ -35,12 +35,10 @@
         }
 
         .topbar {
-            flex-wrap: wrap;
-            padding: 0 1rem;
-            height: auto;
-            gap: 0.5rem;
             background: var(--card);
             border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 56px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -65,33 +63,25 @@
         }
 
         .layout {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            min-height: calc(100vh - 56px);
         }
 
         .sidebar {
-            width: 100%;
             background: var(--card);
-            border-right: none;
-            border-bottom: 1px solid var(--border);
-            padding: 0.5rem;
-            display: flex;
-            overflow-x: auto;
-            gap: 0.5rem;
-            white-space: nowrap;
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 0;
         }
 
         .nav-item {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
-            border-left: none;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            display: block;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
             color: var(--muted);
             text-decoration: none;
+            border-left: 3px solid transparent;
             cursor: pointer;
-            background: transparent;
-            transition: all 0.15s;
         }
 
         .nav-item:hover {
@@ -101,16 +91,23 @@
 
         .nav-item.active {
             color: var(--green);
+            border-left-color: var(--green);
             background: var(--green-lt);
             font-weight: 600;
         }
 
         .nav-section {
-            display: none;
+            padding: 0.75rem 1.5rem 0.25rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-top: 1rem;
         }
 
         .content {
-            padding: 1rem;
+            padding: 2rem;
             overflow-y: auto;
         }
 
@@ -121,9 +118,9 @@
         }
 
         .stats-row {
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
             display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
             margin-bottom: 2rem;
         }
 
@@ -166,8 +163,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.5rem;
         }
 
         .card-title {
@@ -177,7 +172,6 @@
 
         .card-body {
             padding: 1.25rem;
-            overflow-x: auto;
         }
 
         /* Keys */
@@ -186,7 +180,6 @@
             align-items: center;
             gap: 0.75rem;
             margin-bottom: 0.75rem;
-            flex-wrap: wrap;
         }
 
         .key-type {
@@ -218,7 +211,6 @@
             border-radius: 6px;
             flex: 1;
             color: var(--text);
-            min-width: 180px;
         }
 
         .key-inactive {
@@ -270,9 +262,6 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
-            display: block;
-            overflow-x: auto;
-            white-space: nowrap;
         }
 
         th {
@@ -338,9 +327,8 @@
         /* Webhook */
         .webhook-form {
             display: flex;
-            flex-direction: column;
-            align-items: stretch;
             gap: 0.75rem;
+            align-items: center;
         }
 
         .webhook-input {
@@ -350,7 +338,6 @@
             padding: 0.5rem 0.75rem;
             font-size: 0.875rem;
             background: var(--bg);
-            width: 100%;
         }
 
         .webhook-input:focus {
@@ -359,7 +346,7 @@
         }
 
         .feedback {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             padding: 0.5rem 0.75rem;
             border-radius: 6px;
             margin-top: 0.75rem;
@@ -379,54 +366,85 @@
             font-family: 'IBM Plex Mono', monospace;
         }
 
-        /* Desktop styles */
-        @media (min-width: 768px) {
+        /* ========== MOBILE RESPONSIVE (only affects screens <= 768px) ========== */
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 0 1rem;
+                height: auto;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
             .layout {
-                display: grid;
-                grid-template-columns: 220px 1fr;
+                display: flex;
+                flex-direction: column;
             }
 
             .sidebar {
-                flex-direction: column;
-                overflow-x: visible;
-                white-space: normal;
-                padding: 1.5rem 0;
-                border-right: 1px solid var(--border);
-                border-bottom: none;
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 0.5rem;
+                display: flex;
+                overflow-x: auto;
+                gap: 0.5rem;
+                white-space: nowrap;
             }
 
             .nav-item {
-                display: block;
-                padding: 0.5rem 1.5rem;
-                border-radius: 0;
-                white-space: normal;
+                display: inline-block;
+                padding: 0.4rem 0.8rem;
+                border-left: none;
+                border-radius: 20px;
             }
 
             .nav-section {
-                display: block;
-                padding: 0.75rem 1.5rem 0.25rem;
-                font-size: 0.65rem;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.1em;
-                color: var(--muted);
-                margin-top: 1rem;
-            }
-
-            .stats-row {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .webhook-form {
-                flex-direction: row;
+                display: none;
             }
 
             .content {
-                padding: 2rem;
+                padding: 1rem;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .card-body {
+                overflow-x: auto;
+            }
+
+            /* Tables scroll horizontally on mobile */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .key-row {
+                flex-wrap: wrap;
+            }
+
+            .key-val {
+                min-width: 180px;
+            }
+
+            .webhook-form {
+                flex-direction: column;
+                align-items: stretch;
             }
 
             .webhook-input {
-                width: auto;
+                width: 100%;
+            }
+
+            .feedback {
+                font-size: 0.75rem;
+            }
+
+            .btn-sm {
+                padding: 0.3rem 0.6rem;
             }
         }
     </style>
@@ -567,10 +585,10 @@
                                         <td>
                                             <%= new Date(c.created_at).toLocaleDateString() %>
                                         </td>
-                        </table>
-                        <% }) %>
+                                    </tr>
+                                    <% }) %>
                             </tbody>
-                            </table>
+                        </table>
                     </div>
                 </div>
             </div>
