@@ -6,36 +6,46 @@ const path = require('path');
 
 const app = express();
 
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: true }));
-app.set('view engine', 'ejs');
+try {
+    app.use(cors());
+    app.use(bodyParser.json());
+    app.use(express.urlencoded({ extended: true }));
+    app.set('view engine', 'ejs');
 
-app.set('views', path.join(__dirname, '../views'));
-app.use(express.static(path.join(__dirname, '../public')));
+    const projectRoot = path.join(__dirname, '..');
+    app.set('views', path.join(projectRoot, 'views'));
+    app.use(express.static(path.join(projectRoot, 'public')));
 
-const apiRoutes = require('../routes/api');
-const dashboardRoutes = require('../routes/dashboard');
+    const apiRoutes = require('../routes/api');
+    const dashboardRoutes = require('../routes/dashboard');
 
-app.use('/v1', apiRoutes);
-app.use('/dashboard', dashboardRoutes);
+    app.use('/v1', apiRoutes);
+    app.use('/dashboard', dashboardRoutes);
 
-app.get('/', (req, res) => {
-    res.render('index');
-});
-
-app.use((req, res) => {
-    res.status(404).json({
-        type: 'https://api.qore.dev/errors/not-found',
-        title: 'Not Found',
-        status: 404,
-        detail: `Route ${req.method} ${req.path} does not exist`,
-        request_id: require('uuid').v4(),
-        timestamp: new Date().toISOString()
+    app.get('/', (req, res) => {
+        res.render('index');
     });
-});
 
-// Export for Vercel
+    app.use((req, res) => {
+        res.status(404).json({
+            type: 'https://api.qore.dev/errors/not-found',
+            title: 'Not Found',
+            status: 404,
+            detail: `Route ${req.method} ${req.path} does not exist`,
+            request_id: require('uuid').v4(),
+            timestamp: new Date().toISOString()
+        });
+    });
+
+    console.log('App initialized successfully');
+} catch (err) {
+    console.error('Fatal error during startup:', err);
+    module.exports = (req, res) => {
+        res.status(500).json({ error: 'Internal server error during startup' });
+    };
+    return;
+}
+
 module.exports = app;
 
 // Local development only
