@@ -10,6 +10,7 @@
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <style>
+        /* ====== ALL STYLES (same as your working version) ====== */
         :root {
             --bg: #FFFFFF;
             --bg-alt: #F6F9F7;
@@ -202,7 +203,6 @@
             font-size: 0.9rem;
         }
 
-        /* Auth section */
         .auth-card {
             background: var(--bg-alt);
             border: 1px solid var(--border);
@@ -241,7 +241,6 @@
             font-size: 0.8rem;
         }
 
-        /* Endpoint card */
         .section-title {
             font-size: 1.1rem;
             font-weight: 700;
@@ -373,7 +372,6 @@
             border-radius: 3px;
         }
 
-        /* Code blocks */
         .code-block {
             position: relative;
             background: var(--code-bg);
@@ -427,7 +425,6 @@
             margin: 0;
         }
 
-        /* Error table */
         .error-row-4 {
             background: rgba(220, 38, 38, 0.04);
         }
@@ -449,7 +446,6 @@
             color: #EA580C;
         }
 
-        /* Try it section */
         .try-section {
             background: var(--green-lt);
             border: 1px solid rgba(11, 110, 79, 0.2);
@@ -474,7 +470,6 @@
             color: var(--green);
         }
 
-        /* Footer */
         .docs-footer {
             margin-top: 4rem;
             padding-top: 2rem;
@@ -491,7 +486,7 @@
             border-radius: 3px;
         }
 
-        /* ========== MOBILE RESPONSIVE (only affects screens <= 768px) ========== */
+        /* Mobile responsive */
         @media (max-width: 768px) {
             body {
                 flex-direction: column;
@@ -547,7 +542,6 @@
                 text-align: center;
             }
 
-            /* Tables become scrollable horizontally on mobile */
             table {
                 display: block;
                 overflow-x: auto;
@@ -570,27 +564,6 @@
                 font-size: 0.7rem;
             }
 
-            .webhook-form {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .webhook-input {
-                width: 100%;
-            }
-
-            .key-row {
-                flex-wrap: wrap;
-            }
-
-            .key-val {
-                min-width: 180px;
-            }
-
-            .stats-row {
-                grid-template-columns: 1fr;
-            }
-
             .auth-card {
                 padding: 1rem;
             }
@@ -603,32 +576,41 @@
     <!-- Sidebar nav -->
     <nav class="sidebar">
         <div class="sidebar-logo">Qore <span>Integration Hub</span></div>
+
         <div class="nav-section">Getting Started</div>
-        <a class="nav-link" onclick="scrollTo('auth')">Authentication</a>
-        <a class="nav-link" onclick="scrollTo('errors')">Error Handling</a>
+        <a class="nav-link" onclick="scrollToSection('auth')">Authentication</a>
+        <a class="nav-link" onclick="scrollToSection('errors')">Error Handling</a>
+
         <div class="nav-section">Endpoints</div>
-        <a class="nav-link" onclick="scrollTo('customers-post')">
+        <a class="nav-link" onclick="scrollToSection('customers-post')">
             <span class="nav-method nav-post">POST</span>/v1/customers
         </a>
-        <a class="nav-link" onclick="scrollTo('customers-get')">
+        <a class="nav-link" onclick="scrollToSection('customers-get-card')">
             <span class="nav-method nav-get">GET</span>/v1/customers
         </a>
-        <a class="nav-link" onclick="scrollTo('accounts-post')">
+
+        <a class="nav-link" onclick="scrollToSection('accounts-post')">
             <span class="nav-method nav-post">POST</span>/v1/accounts
         </a>
-        <a class="nav-link" onclick="scrollTo('name-enquiry')">
+
+        <a class="nav-link" onclick="scrollToSection('banks-get')">
+            <span class="nav-method nav-get">GET</span>/v1/banks
+        </a>
+
+        <a class="nav-link" onclick="scrollToSection('name-enquiry-card')">
             <span class="nav-method nav-post">POST</span>/v1/transfers/name-enquiry
         </a>
-        <a class="nav-link" onclick="scrollTo('transfers-post')">
+        <a class="nav-link" onclick="scrollToSection('transfers-post-card')">
             <span class="nav-method nav-post">POST</span>/v1/transfers
         </a>
-        <a class="nav-link" onclick="scrollTo('transfers-get')">
+        <a class="nav-link" onclick="scrollToSection('transfers-get-card')">
             <span class="nav-method nav-get">GET</span>/v1/transfers
         </a>
-        <a class="nav-link" onclick="scrollTo('transfers-id')">
+        <a class="nav-link" onclick="scrollToSection('transfers-id-card')">
             <span class="nav-method nav-get">GET</span>/v1/transfers/:id
         </a>
-        <a class="nav-link" onclick="scrollTo('wallet')">
+
+        <a class="nav-link" onclick="scrollToSection('wallet')">
             <span class="nav-method nav-get">GET</span>/v1/wallet-balance
         </a>
     </nav>
@@ -658,17 +640,36 @@
             <button class="copy-btn" style="margin-top:0.5rem" onclick="copyText('authHeader', this)">copy
                 header</button>
             <p class="auth-note">
-                Sandbox keys start with <code>sk_test_</code> — safe-to-fail, rate-limited to 100 req/min.
-                Production keys (<code>sk_live_</code>) are inactive in sandbox and will return 401.
+                Sandbox keys start with <code>sk_test_</code> — safe-to-fail, rate-limited to 100 req/min.<br>
+                Production keys (<code>sk_live_</code>) are inactive in sandbox and will return 401.<br>
                 Get your key from the <a href="/dashboard">developer dashboard</a>.
             </p>
+        </div>
+
+        <!-- IDEMPOTENCY EXPLANATION -->
+        <div class="auth-card" style="background: var(--green-lt); border-color: var(--green);">
+            <h3>🔁 Idempotency – Safe Retries for Financial Operations</h3>
+            <p>All <strong>state-changing requests</strong> (POST /v1/customers, POST /v1/accounts, POST /v1/transfers)
+                require an <code>Idempotency-Key</code> header.</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Why?</strong> If a network timeout occurs, the client can safely retry the exact same
+                    request without risk of duplicate charges or duplicate resources.</li>
+                <li><strong>How?</strong> Send a <strong>UUID v4</strong> (e.g.,
+                    <code>123e4567-e89b-12d3-a456-426614174000</code>) in the <code>Idempotency-Key</code> header.
+                </li>
+                <li>The server caches the response for <strong>24 hours</strong>. A duplicate key with identical payload
+                    returns the cached response with header <code>Idempotent-Replayed: true</code>.</li>
+                <li>If the same key is used with a <strong>different payload</strong>, the server returns
+                    <code>409 Conflict</code>.
+                </li>
+            </ul>
         </div>
 
         <!-- ENDPOINTS -->
         <h2 class="section-title" id="customers-post">Customers</h2>
 
         <!-- POST /v1/customers -->
-        <div class="endpoint-card">
+        <div class="endpoint-card" id="customers-post-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge post-badge">POST</span>
                 <span class="endpoint-path">/v1/customers</span>
@@ -677,8 +678,8 @@
             </div>
             <div class="endpoint-body open">
                 <p>Creates the customer identity record. All subsequent operations (accounts, transfers) require a valid
-                    <code>customer_id</code>. BVN, when provided, is validated asynchronously — customer creation
-                    returns 201 immediately.
+                    <code>customer_id</code>. BVN validation is asynchronous – customer creation returns 201
+                    immediately.
                 </p>
                 <div class="subsection">Request headers</div>
                 <table>
@@ -694,17 +695,14 @@
                             <td><code>Authorization</code></td>
                             <td>Bearer sk_test_xxxxxx</td>
                             <td>Yes</td>
-                        </tr>
                         <tr>
                             <td><code>Idempotency-Key</code></td>
                             <td>UUID v4</td>
                             <td>Yes</td>
-                        </tr>
                         <tr>
                             <td><code>Content-Type</code></td>
                             <td>application/json</td>
                             <td>Yes</td>
-                        </tr>
                     </tbody>
                 </table>
                 <div class="subsection">Request body</div>
@@ -751,15 +749,15 @@
                 <div class="try-section">
                     <h5>🧪 Try it in Postman</h5>
                     <p class="try-note">POST to <code>https://qore-demo.vercel.app/v1/customers</code> with header
-                        <code>Authorization: Bearer sk_test_xxxxxx</code> and an <code>Idempotency-Key</code> UUID.
-                        Try submitting <code>08012345678</code> (without +234) to see the AI hint in action.
+                        <code>Authorization: Bearer sk_test_xxxxxx</code> and an <code>Idempotency-Key</code> UUID. Try
+                        submitting <code>08012345678</code> (without +234) to see the AI hint.
                     </p>
                 </div>
             </div>
         </div>
 
         <!-- GET /v1/customers -->
-        <div class="endpoint-card" id="customers-get">
+        <div class="endpoint-card" id="customers-get-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge get-badge">GET</span>
                 <span class="endpoint-path">/v1/customers</span>
@@ -783,12 +781,10 @@
                             <td><code>email</code></td>
                             <td>string</td>
                             <td>Filter by exact email match</td>
-                        </tr>
                         <tr>
                             <td><code>phone</code></td>
                             <td>string</td>
                             <td>Filter by exact phone number (E.164)</td>
-                        </tr>
                     </tbody>
                 </table>
                 <div class="subsection">Response — 200 OK</div>
@@ -804,9 +800,9 @@
             </div>
         </div>
 
-        <!-- POST /v1/accounts -->
+        <!-- ACCOUNTS -->
         <h2 class="section-title" id="accounts-post">Accounts</h2>
-        <div class="endpoint-card">
+        <div class="endpoint-card" id="accounts-post-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge post-badge">POST</span>
                 <span class="endpoint-path">/v1/accounts</span>
@@ -852,25 +848,50 @@
                         <tr>
                             <td><code>SAVINGS_BASIC</code></td>
                             <td>Basic savings account</td>
-                        </tr>
                         <tr>
                             <td><code>SAVINGS_PREMIUM</code></td>
                             <td>Premium savings with higher limits</td>
-                        </tr>
                         <tr>
                             <td><code>CURRENT</code></td>
                             <td>Current / business account</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Transfers -->
-        <h2 class="section-title" id="name-enquiry">Transfers</h2>
+        <!-- BANKS -->
+        <h2 class="section-title" id="banks-get">Banks</h2>
+        <div class="endpoint-card" id="banks-get-card">
+            <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                <span class="method-badge get-badge">GET</span>
+                <span class="endpoint-path">/v1/banks</span>
+                <span class="endpoint-desc">List supported banks for transfers</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Returns the list of banks available for name-enquiry and transfers. Use the returned
+                    <code>code</code> as <code>destination_bank_code</code>.
+                </p>
+                <div class="subsection">Response — 200 OK</div>
+                <div class="code-block">
+                    <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "banks": [
+    { "code": "044", "name": "Access Bank" },
+    { "code": "011", "name": "First Bank of Nigeria" },
+    { "code": "058", "name": "Guaranty Trust Bank (GTBank)" },
+    { "code": "033", "name": "United Bank for Africa (UBA)" },
+    { "code": "050", "name": "Ecobank Nigeria" }
+  ]
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRANSFERS -->
+        <h2 class="section-title" id="transfers">Transfers</h2>
 
         <!-- POST /v1/transfers/name-enquiry -->
-        <div class="endpoint-card">
+        <div class="endpoint-card" id="name-enquiry-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge post-badge">POST</span>
                 <span class="endpoint-path">/v1/transfers/name-enquiry</span>
@@ -878,8 +899,8 @@
                 <span class="endpoint-desc">Verify destination account</span>
             </div>
             <div class="endpoint-body">
-                <p>Must be called before initiating a transfer. Returns the account holder's name for end-user
-                    confirmation — a fraud prevention requirement.</p>
+                <p>Call this <strong>before</strong> initiating a transfer to fetch the account holder's name. Use a
+                    bank code from <code>GET /v1/banks</code>.</p>
                 <div class="code-block">
                     <div class="code-label">Request body <button class="copy-btn"
                             onclick="copyBlock(this)">copy</button></div>
@@ -903,7 +924,7 @@
         </div>
 
         <!-- POST /v1/transfers -->
-        <div class="endpoint-card" id="transfers-post">
+        <div class="endpoint-card" id="transfers-post-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge post-badge">POST</span>
                 <span class="endpoint-path">/v1/transfers</span>
@@ -913,7 +934,8 @@
             <div class="endpoint-body">
                 <p>Returns <strong>202 Accepted</strong> immediately. Transfer is queued and processed asynchronously.
                     Final status is delivered via webhook (<code>transfer.completed</code> or
-                    <code>transfer.failed</code>). Use GET /v1/transfers/:id to poll if webhooks are unavailable.
+                    <code>transfer.failed</code>). Use <code>GET /v1/transfers/:id</code> to poll if webhooks are
+                    unavailable.
                 </p>
                 <p><strong>Amounts in kobo:</strong> 500000 = NGN 5,000.00</p>
                 <div class="subsection">Request body</div>
@@ -969,27 +991,22 @@
                             <td>1</td>
                             <td>Immediate</td>
                             <td>–</td>
-                        </tr>
                         <tr>
                             <td>2</td>
                             <td>15 seconds</td>
                             <td>5xx, 429, timeout</td>
-                        </tr>
                         <tr>
                             <td>3</td>
                             <td>30 seconds</td>
                             <td>Same</td>
-                        </tr>
                         <tr>
                             <td>4</td>
                             <td>60 seconds</td>
                             <td>Same</td>
-                        </tr>
                         <tr>
                             <td>After 4</td>
                             <td>Dead letter queue</td>
                             <td>Manual replay in dashboard</td>
-                        </tr>
                     </tbody>
                 </table>
                 <p style="margin-top:0.5rem;font-size:0.8rem;color:var(--muted)">4xx responses from integrator endpoint
@@ -997,50 +1014,83 @@
             </div>
         </div>
 
-        <!-- GET /v1/transfers -->
-        <div class="endpoint-card" id="transfers-get">
+        <!-- GET /v1/transfers (list) -->
+        <div class="endpoint-card" id="transfers-get-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge get-badge">GET</span>
                 <span class="endpoint-path">/v1/transfers</span>
                 <span class="endpoint-desc">List all transfers</span>
             </div>
             <div class="endpoint-body">
-                <p>Returns all transfers. Filter by <code>account_id</code> or <code>status</code>.</p>
+                <p>Returns a <strong>list</strong> of all transfers for the authenticated institution. Use query
+                    parameters to filter.</p>
+                <div class="subsection">Query parameters</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>account_id</code></td>
+                            <td>string</td>
+                            <td>Filter by source account</td>
+                        <tr>
+                            <td><code>status</code></td>
+                            <td>string</td>
+                            <td>One of: queued, processing, success, failed, refunded</td>
+                    </tbody>
+                </table>
                 <div class="code-block">
                     <div class="code-label">200 OK <button class="copy-btn" onclick="copyBlock(this)">copy</button>
                     </div>
                     <pre>{
-  "data": [ { "id": "trf_111", "status": "success", "amount": 500000, "currency": "NGN" } ],
+  "data": [
+    { "id": "trf_111", "status": "success", "amount": 500000, "currency": "NGN" }
+  ],
   "meta": { "total_count": 1, "has_more": false }
 }</pre>
                 </div>
             </div>
         </div>
 
-        <!-- GET /v1/transfers/:id -->
-        <div class="endpoint-card" id="transfers-id">
+        <!-- GET /v1/transfers/:id (single) -->
+        <div class="endpoint-card" id="transfers-id-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge get-badge">GET</span>
                 <span class="endpoint-path">/v1/transfers/:id</span>
                 <span class="badge-tag">TSQ fallback</span>
-                <span class="endpoint-desc">Poll transfer status</span>
+                <span class="endpoint-desc">Fetch a single transfer by ID</span>
             </div>
             <div class="endpoint-body">
-                <p>Use when webhooks are unavailable. Poll every 60 seconds. After 5 polls with status
-                    <code>processing</code>, escalate to support with the <code>transfer_id</code>.
+                <p>Use this endpoint to poll the status of a specific transfer when webhooks are not available. The
+                    <code>:id</code> is the <code>transfer_id</code> returned from POST /v1/transfers.
+                </p>
+                <p><strong>How to test in Postman:</strong> After initiating a transfer, copy the
+                    <code>transfer_id</code> from the 202 response, then send a GET request to
+                    <code>/v1/transfers/{transfer_id}</code>. You will see the current status (processing, success, or
+                    failed).
                 </p>
                 <div class="code-block">
                     <div class="code-label">200 OK <button class="copy-btn" onclick="copyBlock(this)">copy</button>
                     </div>
                     <pre>GET /v1/transfers/trf_c3d4e5f6
-→ { "id": "trf_c3d4e5f6", "status": "success", "settlement_reference": "STL-..." }</pre>
+→ {
+  "id": "trf_c3d4e5f6",
+  "status": "success",
+  "amount": 500000,
+  "settlement_reference": "STL-1746091830000"
+}</pre>
                 </div>
             </div>
         </div>
 
         <!-- GET /v1/wallet-balance -->
         <h2 class="section-title" id="wallet">Wallet Balance</h2>
-        <div class="endpoint-card">
+        <div class="endpoint-card" id="wallet-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge get-badge">GET</span>
                 <span class="endpoint-path">/v1/wallet-balance</span>
@@ -1089,44 +1139,37 @@
                             <td class="status-code s4xx">400</td>
                             <td><code>invalid-request</code></td>
                             <td>Missing field, wrong type, format violation</td>
-                        </tr>
                         <tr class="error-row-4">
                             <td class="status-code s4xx">401</td>
                             <td><code>unauthorized</code></td>
                             <td>Missing or invalid API key (sk_live_ in sandbox)</td>
-                        </tr>
                         <tr class="error-row-4">
                             <td class="status-code s4xx">404</td>
                             <td><code>not-found</code></td>
                             <td>customer_id, account_id, or transfer_id not found</td>
-                        </tr>
                         <tr class="error-row-4">
                             <td class="status-code s4xx">409</td>
                             <td><code>conflict</code></td>
                             <td>Duplicate email/phone or idempotency key collision</td>
-                        </tr>
                         <tr class="error-row-4">
                             <td class="status-code s4xx">422</td>
                             <td><code>unprocessable</code></td>
                             <td>Business rule violation (frozen account, wrong product)</td>
-                        </tr>
                         <tr class="error-row-4">
                             <td class="status-code s4xx">429</td>
                             <td><code>rate-limit-exceeded</code></td>
                             <td>100 req/min sandbox limit exceeded</td>
-                        </tr>
                         <tr class="error-row-5">
                             <td class="status-code s5xx">503</td>
                             <td><code>service-unavailable</code></td>
                             <td>Downstream (NIBSS) unreachable — safe to retry</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
         <div class="docs-footer">
-            <p>Base URL: <code>https://qore-demo.vercel.app</code> &nbsp;|&nbsp; Sandbox:
+            <p>Base URL: <code>https://qore-demo.vercel.app/v1</code> &nbsp;|&nbsp; Sandbox:
                 <code>https://qore-demo.vercel.app</code>
             </p>
             <p style="margin-top:0.5rem">TLS 1.2+ required on all requests &nbsp;|&nbsp; Idempotency keys stored 24h
@@ -1140,9 +1183,14 @@
             body.classList.toggle('open');
         }
 
-        function scrollTo(id) {
-            const el = document.getElementById(id);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                console.log(`Scrolled to element with id: ${id}`);
+            } else {
+                console.error(`Element with id "${id}" not found! Check your HTML IDs.`);
+            }
         }
 
         function copyText(id, btn) {
