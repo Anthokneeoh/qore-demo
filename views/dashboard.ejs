@@ -871,7 +871,7 @@
                                                         events.
                                                     </div>
                                                     <% } else { %>
-                                                        <table>
+                                                        <tr>
                                                             <thead>
                                                                 <tr>
                                                                     <th>Event</th>
@@ -914,8 +914,8 @@
                                                                     </tr>
                                                                     <% }) %>
                                                             </tbody>
-                                                        </table>
-                                                        <% } %>
+                                                            </table>
+                                                            <% } %>
                                             </div>
                                         </div>
             </div>
@@ -1017,6 +1017,9 @@
             if (window.innerWidth <= 768) {
                 document.querySelector('.sidebar').classList.remove('open');
             }
+
+            const cleanUrl = window.location.pathname + '?tab=' + name;
+            window.history.replaceState(null, '', cleanUrl);
         }
 
         function openTxModal(tx) {
