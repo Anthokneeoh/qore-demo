@@ -2,12 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const cookieParser = require('cookie-parser');
-
 const {
     getCustomers, getAccounts, getTransfers, getApiKeys,
     updateApiKey, getWebhookUrl, setWebhookUrl
 } = require('../data/mockDb');
-
 const { deliveryLog, resendWebhook } = require('../services/webhookService');
 
 router.use(cookieParser());
@@ -51,7 +49,6 @@ router.post('/login', (req, res) => {
 router.get('/', isDemoAuth, async (req, res) => {
     try {
         const sessionId = req.cookies.session_id;
-
         const customers = await getCustomers();
         const accounts = await getAccounts();
         const transfers = await getTransfers();
@@ -80,13 +77,12 @@ router.post('/generate-key', isDemoAuth, async (req, res) => {
     try {
         const sessionId = req.cookies.session_id;
         const newKey = `sk_test_${uuidv4().replace(/-/g, '').slice(0, 16)}`;
-
         await updateApiKey(sessionId, 'test', newKey);
 
-        res.redirect('/dashboard');
+        res.redirect('/dashboard?tab=developer&key_updated=1');
     } catch (err) {
         console.error('Generate key error:', err);
-        res.redirect('/dashboard?error=key_generation_failed');
+        res.redirect('/dashboard?tab=developer&error=key_generation_failed');
     }
 });
 
@@ -98,30 +94,29 @@ router.post('/webhook', isDemoAuth, async (req, res) => {
         try {
             new URL(url);
         } catch {
-            return res.redirect('/dashboard?error=invalid_url');
+            return res.redirect('/dashboard?tab=webhooks&error=invalid_url');
         }
 
         await setWebhookUrl(sessionId, url);
 
-        res.redirect('/dashboard?saved=1');
+        res.redirect('/dashboard?tab=webhooks&saved=1');
     } catch (err) {
         console.error('Webhook save error:', err);
-        res.redirect('/dashboard?error=webhook_save_failed');
+        res.redirect('/dashboard?tab=webhooks&error=webhook_save_failed');
     }
 });
 
 router.post('/resend-webhook/:webhookId', isDemoAuth, async (req, res) => {
     try {
         const result = await resendWebhook(req.params.webhookId);
-
         if (result.success) {
-            res.redirect('/dashboard?resent=1');
+            res.redirect('/dashboard?tab=webhooks&resent=1');
         } else {
-            res.redirect(`/dashboard?resend_error=${encodeURIComponent(result.error)}`);
+            res.redirect(`/dashboard?tab=webhooks&resend_error=${encodeURIComponent(result.error)}`);
         }
     } catch (err) {
         console.error('Resend webhook error:', err);
-        res.redirect('/dashboard?error=resend_failed');
+        res.redirect('/dashboard?tab=webhooks&error=resend_failed');
     }
 });
 
