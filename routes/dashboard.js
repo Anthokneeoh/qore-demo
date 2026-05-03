@@ -1,41 +1,73 @@
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
+const cookieParser = require('cookie-parser');
+
 const {
     getCustomers, getAccounts, getTransfers, getApiKeys,
     updateApiKey, getWebhookUrl, setWebhookUrl
 } = require('../data/mockDb');
+
 const { deliveryLog, resendWebhook } = require('../services/webhookService');
 
-// Demo auth 
+router.use(cookieParser());
+router.use(express.urlencoded({ extended: true }));
+router.use(express.json());
+
+// Middleware to ensure a secure session_id exists for isolation
+function ensureSession(req, res, next) {
+    if (!req.cookies.session_id) {
+        const newSessionId = uuidv4();
+        res.cookie('session_id', newSessionId, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+        req.cookies.session_id = newSessionId;
+    }
+    next();
+}
+
+router.use(ensureSession);
+
+// Demo-only auth 
 function isDemoAuth(req, res, next) {
     next();
 }
 
-// ── Login pages ────────────────────────────────────────────────────────────
 router.get('/login', (req, res) => res.render('signup'));
 
 router.post('/login', (req, res) => {
-    res.cookie('demo_auth', '1', { maxAge: 86400000 });
+    res.cookie('demo_auth', '1', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 86400000
+    });
     res.redirect('/dashboard');
 });
 
 router.get('/', isDemoAuth, async (req, res) => {
     try {
+        const sessionId = req.cookies.session_id;
+
         const customers = await getCustomers();
         const accounts = await getAccounts();
         const transfers = await getTransfers();
-        const apiKeys = await getApiKeys();
-        const webhookUrl = await getWebhookUrl();
+        const apiKeys = await getApiKeys(sessionId);
+        const webhookUrl = await getWebhookUrl(sessionId);
 
-        console.log('API keys from Supabase:', apiKeys);
         res.render('dashboard', {
             customers,
             accounts,
             transfers,
             apiKeys,
             webhookUrl: webhookUrl || '',
-            webhookLog: deliveryLog.slice(-20).reverse(),
+            webhookLog: deliveryLog
+                .filter(log => log.session_id === sessionId)
+                .slice(-20)
+                .reverse(),
             query: req.query
         });
     } catch (err) {
@@ -45,27 +77,51 @@ router.get('/', isDemoAuth, async (req, res) => {
 });
 
 router.post('/generate-key', isDemoAuth, async (req, res) => {
-    const newKey = `sk_test_${uuidv4().replace(/-/g, '').slice(0, 16)}`;
-    await updateApiKey('sk_test_demo123abc', newKey, 'test');
-    res.redirect('/dashboard');
+    try {
+        const sessionId = req.cookies.session_id;
+        const newKey = `sk_test_${uuidv4().replace(/-/g, '').slice(0, 16)}`;
+
+        await updateApiKey(sessionId, 'test', newKey);
+
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error('Generate key error:', err);
+        res.redirect('/dashboard?error=key_generation_failed');
+    }
 });
 
 router.post('/webhook', isDemoAuth, async (req, res) => {
-    const { url } = req.body;
-    if (!url || !url.startsWith('http')) {
-        return res.redirect('/dashboard?error=invalid_url');
+    try {
+        const sessionId = req.cookies.session_id;
+        const { url } = req.body;
+
+        try {
+            new URL(url);
+        } catch {
+            return res.redirect('/dashboard?error=invalid_url');
+        }
+
+        await setWebhookUrl(sessionId, url);
+
+        res.redirect('/dashboard?saved=1');
+    } catch (err) {
+        console.error('Webhook save error:', err);
+        res.redirect('/dashboard?error=webhook_save_failed');
     }
-    await setWebhookUrl(url);
-    res.redirect('/dashboard?saved=1');
 });
 
-// ── Resend a webhook by ID (from deliveryLog) ──────────────────────────────
 router.post('/resend-webhook/:webhookId', isDemoAuth, async (req, res) => {
-    const result = await resendWebhook(req.params.webhookId);
-    if (result.success) {
-        res.redirect('/dashboard?resent=1');
-    } else {
-        res.redirect(`/dashboard?resend_error=${encodeURIComponent(result.error)}`);
+    try {
+        const result = await resendWebhook(req.params.webhookId);
+
+        if (result.success) {
+            res.redirect('/dashboard?resent=1');
+        } else {
+            res.redirect(`/dashboard?resend_error=${encodeURIComponent(result.error)}`);
+        }
+    } catch (err) {
+        console.error('Resend webhook error:', err);
+        res.redirect('/dashboard?error=resend_failed');
     }
 });
 
