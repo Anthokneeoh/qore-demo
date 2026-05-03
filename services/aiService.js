@@ -3,7 +3,6 @@ const { GoogleGenAI } = require('@google/genai');
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 async function getAIHint(errorCode, field, endpoint) {
-    // Only call AI for 4xx (developer errors). 5xx are infra faults — no hint useful.
     const prompt = `You are an API integration assistant for a Nigerian fintech platform called Qore.
 A developer received this error while calling the API.
 Error code: ${errorCode}
