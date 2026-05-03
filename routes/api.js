@@ -7,17 +7,18 @@ const {
     getCustomers, createCustomer, getCustomerById,
     getAccounts, createAccount, getAccountById, updateAccountStatus,
     getTransfers, getTransferById, createTransfer, updateTransferStatus,
-    getApiKeys, checkIdempotency, storeIdempotency, getWebhookUrl
+    getApiKeyByKey, checkIdempotency, storeIdempotency
 } = require('../data/mockDb');
 
-// Auth helper: only test keys work
 async function authenticate(req) {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith('Bearer ')) return null;
+
     const key = auth.split(' ')[1];
     if (!key.startsWith('sk_test_')) return null;
-    const keys = await getApiKeys();
-    return keys.find(k => k.key === key) || null;
+
+    const apiKey = await getApiKeyByKey(key);
+    return apiKey || null;
 }
 
 // Error helper
@@ -134,15 +135,13 @@ router.post('/accounts', async (req, res) => {
     if (customer.kyc_tier >= 2) {
         setTimeout(async () => {
             await updateAccountStatus(created.id, 'active', { activated_at: new Date().toISOString() });
-            const webhookUrl = await getWebhookUrl();
-            if (webhookUrl) {
-                await fireWebhook('account.activated', {
-                    account_id: created.id,
-                    account_number: created.account_number,
-                    status: 'active',
-                    activated_at: new Date().toISOString()
-                });
-            }
+
+            await fireWebhook('account.activated', {
+                account_id: created.id,
+                account_number: created.account_number,
+                status: 'active',
+                activated_at: new Date().toISOString()
+            }, auth.session_id);
         }, 4000);
     }
     res.status(201).json(created);
@@ -242,30 +241,27 @@ router.post('/transfers', async (req, res) => {
         const success = Math.random() > 0.3;
         if (success) {
             await updateTransferStatus(transferId, 'success', { settlement_reference: `STL-${Date.now()}` });
-            const webhookUrl = await getWebhookUrl();
-            if (webhookUrl) {
-                await fireWebhook('transfer.completed', {
-                    transfer_id: transferId,
-                    status: 'success',
-                    amount: amountKobo,
-                    currency,
-                    nip_session_id: `0904${Date.now()}`,
-                    settlement_reference: `STL-${Date.now()}`,
-                    completed_at: new Date().toISOString()
-                });
-            }
+
+            await fireWebhook('transfer.completed', {
+                transfer_id: transferId,
+                status: 'success',
+                amount: amountKobo,
+                currency,
+                nip_session_id: `0904${Date.now()}`,
+                settlement_reference: `STL-${Date.now()}`,
+                completed_at: new Date().toISOString()
+            }, auth.session_id);
+
         } else {
             await updateTransferStatus(transferId, 'failed', { failure_reason: 'INSUFFICIENT_FUNDS', refund_status: 'refunded', refunded_at: new Date().toISOString() });
-            const webhookUrl = await getWebhookUrl();
-            if (webhookUrl) {
-                await fireWebhook('transfer.failed', {
-                    transfer_id: transferId,
-                    status: 'failed',
-                    failure_reason: 'INSUFFICIENT_FUNDS',
-                    refund_status: 'refunded',
-                    refunded_at: new Date().toISOString()
-                });
-            }
+
+            await fireWebhook('transfer.failed', {
+                transfer_id: transferId,
+                status: 'failed',
+                failure_reason: 'INSUFFICIENT_FUNDS',
+                refund_status: 'refunded',
+                refunded_at: new Date().toISOString()
+            }, auth.session_id);
         }
     }, 3000);
 

@@ -234,6 +234,25 @@ async function updateApiKey(sessionId, type, newKey) {
     return data?.[0] || null;
 }
 
+
+async function getApiKeyByKey(key) {
+    const cacheKey = `api_key_lookup_${key}`;
+    let cached = cache.get(cacheKey);
+    if (cached) return cached;
+
+    const { data, error } = await supabase
+        .from('api_keys')
+        .select('*')
+        .eq('key', key)
+        .limit(1)
+        .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+
+    cache.set(cacheKey, data || null);
+    return data || null;
+}
+
 async function getWebhookUrl(sessionId) {
     const cacheKey = `webhook_${sessionId}`;
     let cached = cache.get(cacheKey);
@@ -311,6 +330,7 @@ module.exports = {
     updateTransferStatus,
     getApiKeys,
     updateApiKey,
+    getApiKeyByKey,
     getWebhookUrl,
     setWebhookUrl,
     checkIdempotency,
