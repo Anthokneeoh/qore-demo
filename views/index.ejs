@@ -42,6 +42,41 @@
             min-height: 100vh;
         }
 
+        /* Topbar (Mobile Only) */
+        .topbar {
+            display: none;
+            background: var(--bg-alt);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1rem;
+            height: 60px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 990;
+            width: 100%;
+        }
+
+        .topbar .logo {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .topbar .logo span {
+            color: var(--green);
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text);
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+
         /* Sidebar */
         .sidebar {
             width: 260px;
@@ -53,6 +88,18 @@
             height: 100vh;
             overflow-y: auto;
             flex-shrink: 0;
+        }
+
+        .sidebar-close {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            position: absolute;
+            top: 1.25rem;
+            right: 1.5rem;
         }
 
         .sidebar-logo {
@@ -80,9 +127,10 @@
 
         .nav-link {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.45rem 1.5rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.3rem;
+            padding: 0.6rem 1.5rem;
             font-size: 0.875rem;
             color: rgba(255, 255, 255, 0.65);
             text-decoration: none;
@@ -104,6 +152,13 @@
             font-family: 'IBM Plex Mono', monospace;
             min-width: 36px;
             text-align: center;
+        }
+
+        .nav-microcopy {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.45);
+            word-break: break-all;
         }
 
         .nav-post {
@@ -200,6 +255,13 @@
             font-weight: 500;
             text-decoration: none;
             font-size: 0.9rem;
+        }
+
+        /* SCROLL MARGIN OFFSETS FOR STICKY HEADERS */
+        .section-title,
+        .endpoint-card,
+        .auth-card {
+            scroll-margin-top: 80px;
         }
 
         .auth-card {
@@ -300,10 +362,14 @@
             font-weight: 600;
         }
 
+        /* MICROCOPY ALIGNMENT FIX */
         .endpoint-desc {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--muted);
-            margin-left: auto;
+            margin-left: 0;
+            flex-basis: 100%;
+            margin-top: 0.3rem;
+            line-height: 1.4;
         }
 
         .badge-tag {
@@ -490,35 +556,37 @@
                 flex-direction: column;
             }
 
-            .sidebar {
-                width: 100%;
-                min-height: auto;
-                height: auto;
-                position: relative;
+            .topbar {
                 display: flex;
-                overflow-x: auto;
-                white-space: nowrap;
-                padding: 0.75rem;
-                gap: 0.5rem;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 280px;
+                height: 100vh;
+                min-height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                display: block;
+                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
                 background: var(--sidebar);
+                overflow-y: auto;
+                padding: 2rem 0;
             }
 
-            .sidebar-logo,
-            .nav-section {
-                display: none;
+            .sidebar.open {
+                left: 0;
             }
 
-            .nav-link {
-                display: inline-flex;
-                padding: 0.4rem 0.8rem;
-                background: rgba(255, 255, 255, 0.08);
-                border-radius: 20px;
-                white-space: nowrap;
+            .sidebar-close {
+                display: block;
             }
 
             .main {
                 max-width: 100%;
-                padding: 1rem;
+                padding: 1.5rem 1rem;
             }
 
             .hero h1 {
@@ -571,48 +639,67 @@
 
 <body>
 
+    <div class="topbar">
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <div class="logo">Qore <span>Integration Hub</span></div>
+        <div style="width: 24px;"></div>
+    </div>
+
     <nav class="sidebar">
+        <button class="sidebar-close" onclick="toggleMenu()">✕</button>
         <div class="sidebar-logo">Qore <span>Integration Hub</span></div>
+
         <div class="nav-section">Getting Started</div>
         <a class="nav-link" onclick="scrollToSection('auth')">Authentication</a>
         <a class="nav-link" onclick="scrollToSection('errors')">Error Handling</a>
+
         <div class="nav-section">Endpoints</div>
         <a class="nav-link" onclick="scrollToSection('customers-post')">
-            <span class="nav-method nav-post">POST</span>/v1/customers
+            <span class="nav-method nav-post">POST</span>
+            <span class="nav-microcopy">/v1/customers</span>
         </a>
         <a class="nav-link" onclick="scrollToSection('customers-get-card')">
-            <span class="nav-method nav-get">GET</span>/v1/customers
+            <span class="nav-method nav-get">GET</span>
+            <span class="nav-microcopy">/v1/customers</span>
         </a>
         <a class="nav-link" onclick="scrollToSection('accounts-post')">
-            <span class="nav-method nav-post">POST</span>/v1/accounts
+            <span class="nav-method nav-post">POST</span>
+            <span class="nav-microcopy">/v1/accounts</span>
         </a>
         <a class="nav-link" onclick="scrollToSection('banks-get')">
-            <span class="nav-method nav-get">GET</span>/v1/banks
+            <span class="nav-method nav-get">GET</span>
+            <span class="nav-microcopy">/v1/banks</span>
         </a>
         <a class="nav-link" onclick="scrollToSection('name-enquiry-card')">
-            <span class="nav-method nav-post">POST</span>/v1/transfers/name-enquiry
+            <span class="nav-method nav-post">POST</span>
+            <span class="nav-microcopy">/v1/transfers/name-enquiry</span>
         </a>
         <a class="nav-link" onclick="scrollToSection('transfers-post-card')">
-            <span class="nav-method nav-post">POST</span>/v1/transfers
+            <span class="nav-method nav-post">POST</span>
+            <span class="nav-microcopy">/v1/transfers</span>
         </a>
         <a class="nav-link" onclick="scrollToSection('transfers-internal-card')">
-            <span class="nav-method nav-post">POST</span>/v1/transfers/internal
+            <span class="nav-method nav-post">POST</span>
+            <span class="nav-microcopy">/v1/transfers/internal</span>
         </a>
         <a class="nav-link" onclick="scrollToSection('transfers-get-card')">
-            <span class="nav-method nav-get">GET</span>/v1/transfers
+            <span class="nav-method nav-get">GET</span>
+            <span class="nav-microcopy">/v1/transfers</span>
         </a>
         <a class="nav-link" onclick="scrollToSection('transfers-id-card')">
-            <span class="nav-method nav-get">GET</span>/v1/transfers/:id
+            <span class="nav-method nav-get">GET</span>
+            <span class="nav-microcopy">/v1/transfers/:id</span>
         </a>
         <a class="nav-link" onclick="scrollToSection('transactions-get')">
-            <span class="nav-method nav-get">GET</span>/v1/transactions
+            <span class="nav-method nav-get">GET</span>
+            <span class="nav-microcopy">/v1/transactions</span>
         </a>
-        <a class="nav-link" onclick="scrollToSection('wallet')">
-            <span class="nav-method nav-get">GET</span>/v1/wallet-balance
+        <a class="nav-link" onclick="scrollToSection('wallet-card')">
+            <span class="nav-method nav-get">GET</span>
+            <span class="nav-microcopy">/v1/wallet-balance</span>
         </a>
     </nav>
 
-    <!-- Main docs -->
     <main class="main">
         <div class="hero">
             <h1>Qore <span>API Reference</span></h1>
@@ -629,7 +716,6 @@
             </div>
         </div>
 
-        <!-- AUTH -->
         <h2 class="section-title" id="auth">Authentication</h2>
         <div class="auth-card">
             <h3>Bearer token — all requests</h3>
@@ -644,10 +730,8 @@
             </p>
         </div>
 
-        <!-- ENDPOINTS -->
         <h2 class="section-title" id="customers-post">Customers</h2>
 
-        <!-- POST /v1/customers -->
         <div class="endpoint-card" id="customers-post-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge post-badge">POST</span>
@@ -738,7 +822,6 @@
             </div>
         </div>
 
-        <!-- GET /v1/customers -->
         <div class="endpoint-card" id="customers-get-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge get-badge">GET</span>
@@ -784,7 +867,6 @@
             </div>
         </div>
 
-        <!-- ACCOUNTS -->
         <h2 class="section-title" id="accounts-post">Accounts</h2>
         <div class="endpoint-card" id="accounts-post-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
@@ -846,7 +928,6 @@
             </div>
         </div>
 
-        <!-- BANKS -->
         <h2 class="section-title" id="banks-get">Banks</h2>
         <div class="endpoint-card" id="banks-get-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
@@ -874,10 +955,8 @@
             </div>
         </div>
 
-        <!-- TRANSFERS -->
         <h2 class="section-title" id="transfers">Transfers</h2>
 
-        <!-- POST /v1/transfers/name-enquiry -->
         <div class="endpoint-card" id="name-enquiry-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge post-badge">POST</span>
@@ -922,7 +1001,6 @@
             </div>
         </div>
 
-        <!-- POST /v1/transfers/interbank -->
         <div class="endpoint-card" id="transfers-post-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge post-badge">POST</span>
@@ -1018,7 +1096,6 @@
             </div>
         </div>
 
-        <!-- POST /v1/transfers/internal -->
         <div class="endpoint-card" id="transfers-internal-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge post-badge">POST</span>
@@ -1061,7 +1138,6 @@
             </div>
         </div>
 
-        <!-- GET /v1/transfers (list) -->
         <div class="endpoint-card" id="transfers-get-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge get-badge">GET</span>
@@ -1106,7 +1182,6 @@
             </div>
         </div>
 
-        <!-- GET /v1/transfers/:id (single) -->
         <div class="endpoint-card" id="transfers-id-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge get-badge">GET</span>
@@ -1137,7 +1212,6 @@
             </div>
         </div>
 
-        <!-- GET /v1/transactions -->
         <h2 class="section-title" id="transactions-get">Transaction History</h2>
         <div class="endpoint-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
@@ -1201,7 +1275,6 @@
             </div>
         </div>
 
-        <!-- GET /v1/wallet-balance -->
         <h2 class="section-title" id="wallet">Wallet Balance</h2>
         <div class="endpoint-card" id="wallet-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
@@ -1234,7 +1307,6 @@
             </div>
         </div>
 
-        <!-- ERROR REFERENCE -->
         <h2 class="section-title" id="errors">Error Reference (RFC 9457)</h2>
         <div class="endpoint-card">
             <div class="endpoint-body open">
