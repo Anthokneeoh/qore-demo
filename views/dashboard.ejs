@@ -721,7 +721,7 @@
                 </div>
             </div>
 
-            <!-- TRANSFERS -->
+            <!-- TRANSFERS (with Direction column) -->
             <div id="section-transfers" style="display:none">
                 <h1 class="page-title">Transactions</h1>
                 <div class="card">
@@ -733,7 +733,7 @@
                                     <th>Amount (NGN)</th>
                                     <th>Destination</th>
                                     <th>Status</th>
-                                    <th>Created</th>
+                                    <th>Direction</th>
                                     <th>View</th>
                                     <th>Resend Webhook</th>
                                 </tr>
@@ -753,9 +753,7 @@
                                         <td><span class="status-pill s-<%= t.status %>">
                                                 <%= t.status %>
                                             </span></td>
-                                        <td>
-                                            <%= new Date(t.created_at).toLocaleDateString() %>
-                                        </td>
+                                        <td>Outgoing</td>
                                         <td>
                                             <button class="btn btn-sm btn-ghost view-btn"
                                                 data-tx="<%= encodeURIComponent(JSON.stringify(t)) %>">View</button>
@@ -871,7 +869,7 @@
                                                         events.
                                                     </div>
                                                     <% } else { %>
-                                                        <tr>
+                                                        <table>
                                                             <thead>
                                                                 <tr>
                                                                     <th>Event</th>
@@ -887,12 +885,10 @@
                                                                         <td class="mono">
                                                                             <%= log.event %>
                                                                         </td>
-                                                                        <td class="mono">
-                                                                            <span class="text-truncate"
+                                                                        <td class="mono"><span class="text-truncate"
                                                                                 title="<%= log.url %>">
                                                                                 <%= log.url %>
-                                                                            </span>
-                                                                        </td>
+                                                                            </span></td>
                                                                         <td><span
                                                                                 class="status-pill s-<%= log.status === 'delivered' ? 'success' : 'failed' %>">
                                                                                 <%= log.status %>
@@ -914,8 +910,8 @@
                                                                     </tr>
                                                                     <% }) %>
                                                             </tbody>
-                                                            </table>
-                                                            <% } %>
+                                                        </table>
+                                                        <% } %>
                                             </div>
                                         </div>
             </div>
@@ -942,7 +938,11 @@
                 <span class="detail-value mono" id="modalAmount"></span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Source Account</span>
+                <span class="detail-label">Source Bank</span>
+                <span class="detail-value">Qore Bank</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Source Account ID</span>
                 <span class="detail-value mono" id="modalSource"></span>
             </div>
             <div class="detail-row">
@@ -1035,7 +1035,7 @@
 
             document.getElementById('modalAmount').textContent = `NGN ${(tx.amount / 100).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
 
-            document.getElementById('modalSource').textContent = `Demo Bank (${tx.source_account_id || '–'})`;
+            document.getElementById('modalSource').textContent = tx.source_account_id || '–';
 
             const bankMap = {
                 '044': 'Access Bank',

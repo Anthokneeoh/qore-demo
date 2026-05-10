@@ -1,20 +1,16 @@
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
-const { getWebhookUrl } = require('../data/mockDb');
 
 const deliveryLog = [];
 const MAX_LOG_SIZE = 1000;
 
-async function fireWebhook(event, payload, sessionId) {
+async function fireWebhook(event, payload, url, sessionId) {
     if (!sessionId) {
         console.error('[Webhook] Missing sessionId — aborting delivery');
         return;
     }
-
-    const webhookUrl = await getWebhookUrl(sessionId);
-
-    if (!webhookUrl) {
-        console.log(`[Webhook] No URL for session ${sessionId} — skipping`);
+    if (!url) {
+        console.log(`[Webhook] No URL provided for session ${sessionId} — skipping`);
         return;
     }
 
@@ -31,7 +27,7 @@ async function fireWebhook(event, payload, sessionId) {
     const logEntry = {
         webhookId,
         event,
-        url: webhookUrl,
+        url,
         payload: body,
         status: 'pending',
         attemptedAt: new Date().toISOString(),
@@ -40,9 +36,9 @@ async function fireWebhook(event, payload, sessionId) {
     };
 
     try {
-        await axios.post(webhookUrl, body, { timeout: 8000 });
+        await axios.post(url, body, { timeout: 8000 });
         logEntry.status = 'delivered';
-        console.log(`[Webhook] Delivered ${event}`);
+        console.log(`[Webhook] Delivered ${event} to ${url}`);
     } catch (err) {
         logEntry.status = 'failed';
         logEntry.error = err.message;

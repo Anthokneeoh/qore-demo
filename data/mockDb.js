@@ -1,15 +1,91 @@
 const supabase = require('./supabaseClient');
 const { v4: uuidv4 } = require('uuid');
 const NodeCache = require('node-cache');
+const crypto = require('crypto');
 
 const cache = new NodeCache({ stdTTL: 60 });
 
-// Utility: clear cache by prefix
 function clearCacheByPrefix(prefix) {
     const keys = cache.keys();
     keys.forEach(k => {
         if (k.startsWith(prefix)) cache.del(k);
     });
+}
+
+function sortedStringify(obj) {
+    if (obj === null || typeof obj !== 'object') return JSON.stringify(obj);
+    if (Array.isArray(obj)) return '[' + obj.map(sortedStringify).join(',') + ']';
+    const keys = Object.keys(obj).sort();
+    const sortedObj = {};
+    for (const key of keys) {
+        sortedObj[key] = sortedStringify(obj[key]);
+    }
+    return JSON.stringify(sortedObj);
+}
+
+function getRequestHash(body) {
+    const sortedStr = sortedStringify(body);
+    return crypto.createHash('sha256').update(sortedStr).digest('hex');
+}
+
+const idempotencyCache = new Map();
+
+function checkIdempotency(key, requestBody) {
+    const cached = idempotencyCache.get(key);
+    if (!cached) return null;
+
+    if (Date.now() > cached.expiresAt) {
+        idempotencyCache.delete(key);
+        return null;
+    }
+
+    const currentHash = getRequestHash(requestBody);
+    if (cached.requestHash !== currentHash) {
+        throw new Error('IDEMPOTENCY_CONFLICT');
+    }
+    return cached.response;
+}
+
+function storeIdempotency(key, requestBody, response) {
+    const requestHash = getRequestHash(requestBody);
+    idempotencyCache.set(key, {
+        response,
+        requestHash,
+        expiresAt: Date.now() + 24 * 60 * 60 * 1000
+    });
+}
+
+async function getOrCreateAccountName(bankCode, accountNumber) {
+    const { data: existing, error: fetchError } = await supabase
+        .from('mock_name_enquiries')
+        .select('account_name')
+        .eq('bank_code', bankCode)
+        .eq('account_number', accountNumber)
+        .maybeSingle();
+
+    if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
+
+    if (existing && existing.account_name) {
+        return existing.account_name;
+    }
+
+    const hash = crypto.createHash('md5').update(`${bankCode}:${accountNumber}`).digest('hex');
+    const mockNames = ['Adeola Ogunlesi', 'Ngozi Adeyemi', 'Emeka Okafor', 'Fatima Al-Hassan', 'Chukwuemeka Eze'];
+    const index = parseInt(hash.slice(0, 8), 16) % mockNames.length;
+    const accountName = mockNames[index];
+
+    const { error: insertError } = await supabase
+        .from('mock_name_enquiries')
+        .insert([{
+            bank_code: bankCode,
+            account_number: accountNumber,
+            account_name: accountName,
+            created_at: new Date().toISOString()
+        }]);
+
+    if (insertError) throw insertError;
+
+    return accountName;
 }
 
 async function getCustomers(filters = {}) {
@@ -181,7 +257,7 @@ async function getApiKeys(sessionId) {
                 type: 'test',
                 session_id: sessionId,
                 label: 'Test key',
-                institution: 'Demo Bank',
+                institution: 'Qore Bank',
                 created_at: new Date().toISOString()
             },
             {
@@ -189,7 +265,7 @@ async function getApiKeys(sessionId) {
                 type: 'live',
                 session_id: sessionId,
                 label: 'Live key (inactive in sandbox)',
-                institution: 'Demo Bank',
+                institution: 'Qore Bank',
                 created_at: new Date().toISOString()
             }
         ]);
@@ -223,7 +299,7 @@ async function updateApiKey(sessionId, type, newKey) {
             type,
             session_id: sessionId,
             label: type === 'test' ? 'Test key' : 'Live key (inactive in sandbox)',
-            institution: 'Demo Bank',
+            institution: 'Qore Bank',
             created_at: new Date().toISOString()
         }])
         .select();
@@ -233,7 +309,6 @@ async function updateApiKey(sessionId, type, newKey) {
     cache.del(`api_keys_${sessionId}`);
     return data?.[0] || null;
 }
-
 
 async function getApiKeyByKey(key) {
     const cacheKey = `api_key_lookup_${key}`;
@@ -295,27 +370,6 @@ async function setWebhookUrl(sessionId, url) {
     return data?.[0] || null;
 }
 
-const idempotencyCache = new Map();
-
-function checkIdempotency(key) {
-    const cached = idempotencyCache.get(key);
-    if (!cached) return null;
-
-    if (Date.now() > cached.expiresAt) {
-        idempotencyCache.delete(key);
-        return null;
-    }
-
-    return cached.response;
-}
-
-function storeIdempotency(key, response) {
-    idempotencyCache.set(key, {
-        response,
-        expiresAt: Date.now() + 24 * 60 * 60 * 1000
-    });
-}
-
 module.exports = {
     getCustomers,
     createCustomer,
@@ -334,5 +388,6 @@ module.exports = {
     getWebhookUrl,
     setWebhookUrl,
     checkIdempotency,
-    storeIdempotency
+    storeIdempotency,
+    getOrCreateAccountName
 };

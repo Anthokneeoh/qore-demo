@@ -12,7 +12,6 @@ router.use(cookieParser());
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
 
-// Middleware to ensure a secure session_id exists for isolation
 function ensureSession(req, res, next) {
     if (!req.cookies.session_id) {
         const newSessionId = uuidv4();
@@ -29,7 +28,6 @@ function ensureSession(req, res, next) {
 
 router.use(ensureSession);
 
-// Demo-only auth 
 function isDemoAuth(req, res, next) {
     next();
 }
@@ -55,16 +53,18 @@ router.get('/', isDemoAuth, async (req, res) => {
         const apiKeys = await getApiKeys(sessionId);
         const webhookUrl = await getWebhookUrl(sessionId);
 
+        const safeWebhookLog = (deliveryLog || [])
+            .filter(log => log && typeof log === 'object' && log.session_id === sessionId)
+            .slice(-20)
+            .reverse();
+
         res.render('dashboard', {
             customers,
             accounts,
             transfers,
             apiKeys,
             webhookUrl: webhookUrl || '',
-            webhookLog: deliveryLog
-                .filter(log => log.session_id === sessionId)
-                .slice(-20)
-                .reverse(),
+            webhookLog: safeWebhookLog,
             query: req.query
         });
     } catch (err) {
@@ -78,7 +78,6 @@ router.post('/generate-key', isDemoAuth, async (req, res) => {
         const sessionId = req.cookies.session_id;
         const newKey = `sk_test_${uuidv4().replace(/-/g, '').slice(0, 16)}`;
         await updateApiKey(sessionId, 'test', newKey);
-
         res.redirect('/dashboard?tab=developer&key_updated=1');
     } catch (err) {
         console.error('Generate key error:', err);
@@ -90,15 +89,12 @@ router.post('/webhook', isDemoAuth, async (req, res) => {
     try {
         const sessionId = req.cookies.session_id;
         const { url } = req.body;
-
         try {
             new URL(url);
         } catch {
             return res.redirect('/dashboard?tab=webhooks&error=invalid_url');
         }
-
         await setWebhookUrl(sessionId, url);
-
         res.redirect('/dashboard?tab=webhooks&saved=1');
     } catch (err) {
         console.error('Webhook save error:', err);

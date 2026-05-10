@@ -42,43 +42,7 @@
             min-height: 100vh;
         }
 
-        .mobile-header {
-            display: none;
-            padding: 1rem 1.5rem;
-            background: var(--sidebar);
-            color: #fff;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 990;
-        }
-
-        .mobile-logo {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .mobile-logo span {
-            color: var(--green-glow);
-        }
-
-        .menu-toggle,
-        .sidebar-close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .sidebar-close {
-            display: none;
-            position: absolute;
-            top: 1rem;
-            right: 1.5rem;
-        }
-
+        /* Sidebar */
         .sidebar {
             width: 260px;
             min-height: 100vh;
@@ -152,6 +116,7 @@
             color: #4DB8FF;
         }
 
+        /* Main content */
         .main {
             flex: 1;
             max-width: 900px;
@@ -336,11 +301,9 @@
         }
 
         .endpoint-desc {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--muted);
-            width: 100%;
-            margin-top: 0.5rem;
-            text-align: left;
+            margin-left: auto;
         }
 
         .badge-tag {
@@ -527,41 +490,35 @@
                 flex-direction: column;
             }
 
-            .mobile-header {
-                display: flex;
-            }
-
             .sidebar {
-                position: fixed;
-                top: 0;
-                left: -100%;
-                width: 280px;
-                height: 100vh;
-                z-index: 1000;
-                transition: left 0.3s ease;
-                display: block;
-                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+                width: 100%;
+                min-height: auto;
+                height: auto;
+                position: relative;
+                display: flex;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: 0.75rem;
+                gap: 0.5rem;
+                background: var(--sidebar);
             }
 
-            .sidebar.open {
-                left: 0;
-            }
-
-            .sidebar-close {
-                display: block;
+            .sidebar-logo,
+            .nav-section {
+                display: none;
             }
 
             .nav-link {
-                display: flex;
-                padding: 0.8rem 1.5rem;
-                border-radius: 0;
-                background: transparent;
-                white-space: normal;
+                display: inline-flex;
+                padding: 0.4rem 0.8rem;
+                background: rgba(255, 255, 255, 0.08);
+                border-radius: 20px;
+                white-space: nowrap;
             }
 
             .main {
                 max-width: 100%;
-                padding: 1.5rem 1rem;
+                padding: 1rem;
             }
 
             .hero h1 {
@@ -614,18 +571,11 @@
 
 <body>
 
-    <div class="mobile-header">
-        <div class="mobile-logo">Qore <span>Integration Hub</span></div>
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    </div>
     <nav class="sidebar">
-        <button class="sidebar-close" onclick="toggleMenu()">✕</button>
         <div class="sidebar-logo">Qore <span>Integration Hub</span></div>
-
         <div class="nav-section">Getting Started</div>
         <a class="nav-link" onclick="scrollToSection('auth')">Authentication</a>
         <a class="nav-link" onclick="scrollToSection('errors')">Error Handling</a>
-
         <div class="nav-section">Endpoints</div>
         <a class="nav-link" onclick="scrollToSection('customers-post')">
             <span class="nav-method nav-post">POST</span>/v1/customers
@@ -633,20 +583,20 @@
         <a class="nav-link" onclick="scrollToSection('customers-get-card')">
             <span class="nav-method nav-get">GET</span>/v1/customers
         </a>
-
         <a class="nav-link" onclick="scrollToSection('accounts-post')">
             <span class="nav-method nav-post">POST</span>/v1/accounts
         </a>
-
         <a class="nav-link" onclick="scrollToSection('banks-get')">
             <span class="nav-method nav-get">GET</span>/v1/banks
         </a>
-
         <a class="nav-link" onclick="scrollToSection('name-enquiry-card')">
             <span class="nav-method nav-post">POST</span>/v1/transfers/name-enquiry
         </a>
         <a class="nav-link" onclick="scrollToSection('transfers-post-card')">
             <span class="nav-method nav-post">POST</span>/v1/transfers
+        </a>
+        <a class="nav-link" onclick="scrollToSection('transfers-internal-card')">
+            <span class="nav-method nav-post">POST</span>/v1/transfers/internal
         </a>
         <a class="nav-link" onclick="scrollToSection('transfers-get-card')">
             <span class="nav-method nav-get">GET</span>/v1/transfers
@@ -654,7 +604,9 @@
         <a class="nav-link" onclick="scrollToSection('transfers-id-card')">
             <span class="nav-method nav-get">GET</span>/v1/transfers/:id
         </a>
-
+        <a class="nav-link" onclick="scrollToSection('transactions-get')">
+            <span class="nav-method nav-get">GET</span>/v1/transactions
+        </a>
         <a class="nav-link" onclick="scrollToSection('wallet')">
             <span class="nav-method nav-get">GET</span>/v1/wallet-balance
         </a>
@@ -687,7 +639,8 @@
             <p class="auth-note">
                 Sandbox keys start with <code>sk_test_</code> — safe-to-fail, rate-limited to 100 req/min.<br>
                 Production keys (<code>sk_live_</code>) are inactive in sandbox and will return 401.<br>
-                Get your key from the <a href="/dashboard">developer dashboard</a>.
+                Get your key from the <a href="/dashboard">developer dashboard</a>. Keys are issued under <strong>Qore
+                    Bank</strong>.
             </p>
         </div>
 
@@ -721,14 +674,17 @@
                             <td><code>Authorization</code></td>
                             <td>Bearer sk_test_xxxxxx</td>
                             <td>Yes</td>
+                        </tr>
                         <tr>
                             <td><code>Idempotency-Key</code></td>
                             <td>UUID v4</td>
                             <td>Yes</td>
+                        </tr>
                         <tr>
                             <td><code>Content-Type</code></td>
                             <td>application/json</td>
                             <td>Yes</td>
+                        </tr>
                     </tbody>
                 </table>
                 <div class="subsection">Request body</div>
@@ -807,10 +763,12 @@
                             <td><code>email</code></td>
                             <td>string</td>
                             <td>Filter by exact email match</td>
+                        </tr>
                         <tr>
                             <td><code>phone</code></td>
                             <td>string</td>
                             <td>Filter by exact phone number (E.164)</td>
+                        </tr>
                     </tbody>
                 </table>
                 <div class="subsection">Response — 200 OK</div>
@@ -874,12 +832,15 @@
                         <tr>
                             <td><code>SAVINGS_BASIC</code></td>
                             <td>Basic savings account</td>
+                        </tr>
                         <tr>
                             <td><code>SAVINGS_PREMIUM</code></td>
                             <td>Premium savings with higher limits</td>
+                        </tr>
                         <tr>
                             <td><code>CURRENT</code></td>
                             <td>Current / business account</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -925,31 +886,43 @@
                 <span class="endpoint-desc">Verify destination account</span>
             </div>
             <div class="endpoint-body">
-                <p>Call this <strong>before</strong> initiating a transfer to fetch the account holder's name. Use a
-                    bank code from <code>GET /v1/banks</code>.</p>
+                <p>Call this <strong>before</strong> initiating an interbank transfer. Always use a 10‑digit NUBAN
+                    account number. For sandbox, only accounts starting with <code>123456</code> are considered valid;
+                    otherwise, a <code>404</code> is returned.</p>
                 <div class="code-block">
                     <div class="code-label">Request body <button class="copy-btn"
                             onclick="copyBlock(this)">copy</button></div>
                     <pre>{
   "destination_bank_code":      "044",
-  "destination_account_number": "0123456789"
+  "destination_account_number": "1234567890"
 }</pre>
                 </div>
                 <div class="code-block">
-                    <div class="code-label">200 OK <button class="copy-btn" onclick="copyBlock(this)">copy</button>
-                    </div>
+                    <div class="code-label">200 OK (valid account) <button class="copy-btn"
+                            onclick="copyBlock(this)">copy</button></div>
                     <pre>{
   "account_name":   "Adeola Ogunlesi",
   "bank_name":      "Access Bank",
   "bank_code":      "044",
-  "account_number": "0123456789",
+  "account_number": "1234567890",
   "verified_at":    "2026-05-01T10:09:00Z"
+}</pre>
+                </div>
+                <div class="code-block">
+                    <div class="code-label">404 Not Found (invalid account) <button class="copy-btn"
+                            onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "type": "https://api.qore.dev/errors/not-found",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "The specified account number was not found in the bank records.",
+  "request_id": "..."
 }</pre>
                 </div>
             </div>
         </div>
 
-        <!-- POST /v1/transfers -->
+        <!-- POST /v1/transfers/interbank -->
         <div class="endpoint-card" id="transfers-post-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge post-badge">POST</span>
@@ -970,7 +943,7 @@
                     <pre>{
   "source_account_id":          "acc_111",
   "destination_bank_code":       "044",
-  "destination_account_number":  "0123456789",
+  "destination_account_number":  "1234567890",
   "destination_account_name":    "Adeola Ogunlesi",
   "amount":                      500000,
   "currency":                    "NGN",
@@ -1017,35 +990,83 @@
                             <td>1</td>
                             <td>Immediate</td>
                             <td>–</td>
+                        </tr>
                         <tr>
                             <td>2</td>
                             <td>15 seconds</td>
                             <td>5xx, 429, timeout</td>
+                        </tr>
                         <tr>
                             <td>3</td>
                             <td>30 seconds</td>
                             <td>Same</td>
+                        </tr>
                         <tr>
                             <td>4</td>
                             <td>60 seconds</td>
                             <td>Same</td>
+                        </tr>
                         <tr>
                             <td>After 4</td>
                             <td>Dead letter queue</td>
                             <td>Manual replay in dashboard</td>
+                        </tr>
                     </tbody>
                 </table>
                 <p style="margin-top:0.5rem;font-size:0.8rem;color:var(--muted)">4xx responses from integrator endpoint
-                    are NOT retried — a misconfigured handler will not self-heal.</p>
+                    are NOT retried.</p>
             </div>
         </div>
 
-        <!-- GET /v1/transfers -->
+        <!-- POST /v1/transfers/internal -->
+        <div class="endpoint-card" id="transfers-internal-card">
+            <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                <span class="method-badge post-badge">POST</span>
+                <span class="endpoint-path">/v1/transfers/internal</span>
+                <span class="badge-tag">Synchronous · Idempotency-Key required</span>
+                <span class="endpoint-desc">Internal transfer (Qore customer to Qore customer)</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Transfers money between two accounts <strong>within the same Qore platform</strong>. The transfer is
+                    synchronous – the balance updates immediately, and a webhook is fired after success. No name‑enquiry
+                    is required; the destination account is identified by its <code>account_id</code>.</p>
+                <div class="subsection">Request body</div>
+                <div class="code-block">
+                    <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "source_account_id":      "acc_111",
+  "destination_account_id": "acc_222",
+  "amount":                 250000,
+  "currency":               "NGN",
+  "narration":              "Payment for goods"
+}</pre>
+                </div>
+                <div class="subsection">Response — 201 Created</div>
+                <div class="code-block">
+                    <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
+                    <pre>{
+  "id":                     "trf_d5e6f7g8",
+  "source_account_id":      "acc_111",
+  "destination_account_id": "acc_222",
+  "amount":                 250000,
+  "currency":               "NGN",
+  "status":                 "success",
+  "narration":              "Payment for goods",
+  "created_at":             "2026-05-01T10:15:00Z"
+}</pre>
+                </div>
+                <div class="subsection">Webhook (same as interbank)</div>
+                <p>If a webhook URL is saved in the dashboard, a <code>transfer.completed</code> event is fired
+                    immediately after the transfer is recorded.</p>
+            </div>
+        </div>
+
+        <!-- GET /v1/transfers (list) -->
         <div class="endpoint-card" id="transfers-get-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge get-badge">GET</span>
                 <span class="endpoint-path">/v1/transfers</span>
-                <span class="endpoint-desc">List all transfers</span>
+                <span class="endpoint-desc">List all transfers (source account filter)</span>
             </div>
             <div class="endpoint-body">
                 <p>Returns a <strong>list</strong> of all transfers for the authenticated institution. Use query
@@ -1064,10 +1085,12 @@
                             <td><code>account_id</code></td>
                             <td>string</td>
                             <td>Filter by source account</td>
+                        </tr>
                         <tr>
                             <td><code>status</code></td>
                             <td>string</td>
                             <td>One of: queued, processing, success, failed, refunded</td>
+                        </tr>
                     </tbody>
                 </table>
                 <div class="code-block">
@@ -1083,7 +1106,7 @@
             </div>
         </div>
 
-        <!-- GET /v1/transfers/:id -->
+        <!-- GET /v1/transfers/:id (single) -->
         <div class="endpoint-card" id="transfers-id-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge get-badge">GET</span>
@@ -1114,17 +1137,82 @@
             </div>
         </div>
 
+        <!-- GET /v1/transactions -->
+        <h2 class="section-title" id="transactions-get">Transaction History</h2>
+        <div class="endpoint-card">
+            <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                <span class="method-badge get-badge">GET</span>
+                <span class="endpoint-path">/v1/transactions</span>
+                <span class="endpoint-desc">List all transfers where account is source OR destination</span>
+            </div>
+            <div class="endpoint-body">
+                <p>Returns all transfers (interbank + internal) where the specified account is either the
+                    <strong>source</strong> or the <strong>destination</strong>. The response includes a
+                    <code>direction</code> field: <code>"outgoing"</code> (money sent) or <code>"incoming"</code> (money
+                    received).
+                </p>
+                <div class="subsection">Query parameters</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>account_id</code></td>
+                            <td>string</td>
+                            <td>Yes</td>
+                            <td>The account ID (e.g., <code>acc_111</code>) to fetch history for.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="code-block">
+                    <div class="code-label">200 OK <button class="copy-btn" onclick="copyBlock(this)">copy</button>
+                    </div>
+                    <pre>{
+  "data": [
+    {
+      "id": "trf_111",
+      "source_account_id": "acc_111",
+      "destination_account_id": null,
+      "destination_account_number": "1234567890",
+      "amount": 500000,
+      "status": "success",
+      "direction": "outgoing",
+      "created_at": "2026-05-01T10:10:00Z"
+    },
+    {
+      "id": "trf_222",
+      "source_account_id": "acc_222",
+      "destination_account_id": "acc_111",
+      "amount": 250000,
+      "status": "success",
+      "direction": "incoming",
+      "created_at": "2026-05-01T10:15:00Z"
+    }
+  ],
+  "meta": { "total_count": 2, "has_more": false }
+}</pre>
+                </div>
+            </div>
+        </div>
+
         <!-- GET /v1/wallet-balance -->
         <h2 class="section-title" id="wallet">Wallet Balance</h2>
         <div class="endpoint-card" id="wallet-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge get-badge">GET</span>
                 <span class="endpoint-path">/v1/wallet-balance</span>
-                <span class="endpoint-desc">Get account balance</span>
+                <span class="endpoint-desc">Get account balance (dynamically computed)</span>
             </div>
             <div class="endpoint-body">
                 <p>Returns available and ledger balance for a given account in kobo. Sandbox accounts start with NGN
-                    100,000.00 seed balance.</p>
+                    100,000.00 seed balance. The balance is recomputed in real‑time from all successful transfers (both
+                    interbank and internal).</p>
                 <div class="code-block">
                     <div class="code-label">Request <button class="copy-btn" onclick="copyBlock(this)">copy</button>
                     </div>
@@ -1165,37 +1253,44 @@
                             <td class="status-code s4xx">400</td>
                             <td><code>invalid-request</code></td>
                             <td>Missing field, wrong type, format violation</td>
+                        </tr>
                         <tr class="error-row-4">
                             <td class="status-code s4xx">401</td>
                             <td><code>unauthorized</code></td>
                             <td>Missing or invalid API key (sk_live_ in sandbox)</td>
+                        </tr>
                         <tr class="error-row-4">
                             <td class="status-code s4xx">404</td>
                             <td><code>not-found</code></td>
                             <td>customer_id, account_id, or transfer_id not found</td>
+                        </tr>
                         <tr class="error-row-4">
                             <td class="status-code s4xx">409</td>
                             <td><code>conflict</code></td>
-                            <td>Duplicate email/phone or idempotency key collision</td>
+                            <td>Duplicate email/phone, idempotency key collision (different payload, same key)</td>
+                        </tr>
                         <tr class="error-row-4">
                             <td class="status-code s4xx">422</td>
                             <td><code>unprocessable</code></td>
-                            <td>Business rule violation (frozen account, wrong product)</td>
+                            <td>Business rule violation (frozen account, insufficient funds, wrong product)</td>
+                        </tr>
                         <tr class="error-row-4">
                             <td class="status-code s4xx">429</td>
                             <td><code>rate-limit-exceeded</code></td>
                             <td>100 req/min sandbox limit exceeded</td>
+                        </tr>
                         <tr class="error-row-5">
                             <td class="status-code s5xx">503</td>
                             <td><code>service-unavailable</code></td>
                             <td>Downstream (NIBSS) unreachable — safe to retry</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
         <div class="docs-footer">
-            <p>Base URL: <code>https://qore-demo.vercel.app/v1</code> &nbsp;|&nbsp; Sandbox:
+            <p>Base URL: <code>https://qore-demo.vercel.app</code> &nbsp;|&nbsp; Sandbox:
                 <code>https://qore-demo.vercel.app</code>
             </p>
             <p style="margin-top:0.5rem">TLS 1.2+ required on all requests &nbsp;|&nbsp; Idempotency keys stored 24h
@@ -1205,7 +1300,8 @@
 
     <script>
         function toggleMenu() {
-            document.querySelector('.sidebar').classList.toggle('open');
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) sidebar.classList.toggle('open');
         }
 
         function toggleEndpoint(header) {
@@ -1217,14 +1313,12 @@
             const element = document.getElementById(id);
             if (element) {
                 element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                console.log(`Scrolled to element with id: ${id}`);
-
-                // Auto-close menu on mobile after selection
+                // Close mobile menu if open
                 if (window.innerWidth <= 768) {
-                    document.querySelector('.sidebar').classList.remove('open');
+                    document.querySelector('.sidebar')?.classList.remove('open');
                 }
             } else {
-                console.error(`Element with id "${id}" not found! Check your HTML IDs.`);
+                console.error(`Element with id "${id}" not found!`);
             }
         }
 
