@@ -35,6 +35,9 @@ async function authenticate(req) {
     const key = auth.split(' ')[1];
     if (!key.startsWith('sk_test_')) return null;
     const apiKey = await getApiKeyByKey(key);
+    if (apiKey) {
+        req.sessionId = apiKey.session_id;
+    }
     return apiKey || null;
 }
 
@@ -221,7 +224,7 @@ router.post('/accounts', async (req, res) => {
         setTimeout(async () => {
             try {
                 await updateAccountStatus(created.id, 'active', { activated_at: new Date().toISOString() });
-                const sessionId = req.cookies.session_id;
+                const sessionId = req.sessionId || req.cookies.session_id;
                 const webhookUrl = await getWebhookUrl(sessionId);
                 if (webhookUrl) {
                     await fireWebhook('account.activated', {
@@ -337,7 +340,7 @@ router.post('/transfers', async (req, res) => {
     if (!/^\d{10}$/.test(destination_account_number))
         return sendError(req, res, 400, 'invalid-request', 'Invalid Request', 'Destination account must be 10-digit NUBAN');
 
-    const sessionId = req.cookies.session_id;
+    const sessionId = req.sessionId || req.cookies.session_id;
     const currentWebhookUrl = await getWebhookUrl(sessionId);
 
     const transferId = `trf_${uuidv4().slice(0, 8)}`;
@@ -498,7 +501,7 @@ router.post('/transfers/internal', async (req, res) => {
     if (availableBalance < amountKobo)
         return sendError(req, res, 422, 'unprocessable', 'Unprocessable', 'Insufficient funds');
 
-    const sessionId = req.cookies.session_id;
+    const sessionId = req.sessionId || req.cookies.session_id;
     const currentWebhookUrl = await getWebhookUrl(sessionId);
 
     const transferId = `trf_${uuidv4().slice(0, 8)}`;
