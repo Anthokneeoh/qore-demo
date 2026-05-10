@@ -642,7 +642,11 @@
                                                 <%= t.status %>
                                             </span></td>
                                         <td>
-                                            <%= new Date(t.created_at).toLocaleDateString() %>
+                                            <span style="white-space:nowrap;font-size:0.8rem;color:var(--muted)">
+                                                <%= new Date(t.created_at).toLocaleString('en-GB', { day: 'numeric' ,
+                                                    month: 'short' , year: 'numeric' , hour: '2-digit' ,
+                                                    minute: '2-digit' }) %>
+                                            </span>
                                         </td>
                                     </tr>
                                     <% }) %>
@@ -666,7 +670,7 @@
                                     <th>Email</th>
                                     <th>KYC Tier</th>
                                     <th>Status</th>
-                                    <th>Created</th>
+                                    <th>Date Registered</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -693,7 +697,11 @@
                                         </td>
                                         <td><span class="status-pill s-active">active</span></td>
                                         <td>
-                                            <%= new Date(c.created_at).toLocaleDateString() %>
+                                            <span style="white-space:nowrap;font-size:0.8rem;color:var(--muted)">
+                                                <%= new Date(c.created_at).toLocaleString('en-GB', { day: 'numeric' ,
+                                                    month: 'short' , year: 'numeric' , hour: '2-digit' ,
+                                                    minute: '2-digit' }) %>
+                                            </span>
                                         </td>
                                     </tr>
                                     <% }) %>
@@ -717,6 +725,7 @@
                                     <th>Product</th>
                                     <th>Currency</th>
                                     <th>Status</th>
+                                    <th>Date Created</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -744,6 +753,13 @@
                                                 class="status-pill s-<%= a.status === 'active' ? 'active' : 'pending' %>">
                                                 <%= a.status.replace(/_/g, ' ' ) %>
                                             </span></td>
+                                        <td>
+                                            <span style="white-space:nowrap;font-size:0.8rem;color:var(--muted)">
+                                                <%= new Date(a.created_at).toLocaleString('en-GB', { day: 'numeric' ,
+                                                    month: 'short' , year: 'numeric' , hour: '2-digit' ,
+                                                    minute: '2-digit' }) %>
+                                            </span>
+                                        </td>
                                     </tr>
                                     <% }) %>
                             </tbody>
@@ -765,6 +781,7 @@
                                     <th>Destination</th>
                                     <th>Status</th>
                                     <th>Direction</th>
+                                    <th>Date</th>
                                     <th>View</th>
                                     <th>Resend Webhook</th>
                                 </tr>
@@ -819,6 +836,13 @@
                                                     <span class="status-pill"
                                                         style="background:#FEF3C7; color:#92400E">Outbound</span>
                                                     <% } %>
+                                        </td>
+                                        <td>
+                                            <span style="white-space:nowrap;font-size:0.8rem;color:var(--muted)">
+                                                <%= new Date(t.created_at).toLocaleString('en-GB', { day: 'numeric' ,
+                                                    month: 'short' , year: 'numeric' , hour: '2-digit' ,
+                                                    minute: '2-digit' }) %>
+                                            </span>
                                         </td>
                                         <td>
                                             <button class="btn btn-sm btn-ghost view-btn"
@@ -939,7 +963,7 @@
                                                                     <th>Event</th>
                                                                     <th>URL</th>
                                                                     <th>Status</th>
-                                                                    <th>Time</th>
+                                                                    <th>Date Attempted</th>
                                                                     <th>Resend</th>
                                                                 </tr>
                                                             </thead>
@@ -961,9 +985,14 @@
                                                                                 <%= log.status %>
                                                                             </span></td>
                                                                         <td>
-                                                                            <%= new
-                                                                                Date(log.attemptedAt).toLocaleTimeString()
-                                                                                %>
+                                                                            <span
+                                                                                style="white-space:nowrap;font-size:0.8rem;color:var(--muted)">
+                                                                                <%= new
+                                                                                    Date(log.attemptedAt).toLocaleString('en-GB',
+                                                                                    { day: 'numeric' , month: 'short' ,
+                                                                                    year: 'numeric' , hour: '2-digit' ,
+                                                                                    minute: '2-digit' }) %>
+                                                                            </span>
                                                                         </td>
                                                                         <td>
                                                                             <form method="POST"
