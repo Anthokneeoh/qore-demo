@@ -814,8 +814,7 @@
                 </div>
                 <div class="try-section">
                     <h5>🧪 Try it in Postman</h5>
-                    <p class="try-note">POST to <code>https://qore-demo.vercel.app/v1/customers</code> with header
-                        <code>Authorization: Bearer sk_test_xxxxxx</code> and an <code>Idempotency-Key</code> UUID. Try
+                    <p class="try-note">Try
                         submitting <code>08012345678</code> (without +234) to see the AI hint.
                     </p>
                 </div>
@@ -1011,8 +1010,7 @@
             <div class="endpoint-body">
                 <p>Returns <strong>202 Accepted</strong> immediately. Transfer is queued and processed asynchronously.
                     Final status is delivered via webhook (<code>transfer.completed</code> or
-                    <code>transfer.failed</code>). Use <code>GET /v1/transfers/:id</code> to poll if webhooks are
-                    unavailable.
+                    <code>transfer.failed</code>).
                 </p>
                 <p><strong>Amounts in kobo:</strong> 500000 = NGN 5,000.00</p>
                 <div class="subsection">Request body</div>
@@ -1105,8 +1103,7 @@
             </div>
             <div class="endpoint-body">
                 <p>Transfers money between two accounts <strong>within the same Qore platform</strong>. The transfer is
-                    synchronous – the balance updates immediately, and a webhook is fired after success. No name‑enquiry
-                    is required; the destination account is identified by its <code>account_id</code>.</p>
+                    synchronous – the balance updates immediately, and a webhook is fired after success.</p>
                 <div class="subsection">Request body</div>
                 <div class="code-block">
                     <div class="code-label">JSON <button class="copy-btn" onclick="copyBlock(this)">copy</button></div>
@@ -1193,11 +1190,7 @@
                 <p>Use this endpoint to poll the status of a specific transfer when webhooks are not available. The
                     <code>:id</code> is the <code>transfer_id</code> returned from POST /v1/transfers.
                 </p>
-                <p><strong>How to test in Postman:</strong> After initiating a transfer, copy the
-                    <code>transfer_id</code> from the 202 response, then send a GET request to
-                    <code>/v1/transfers/{transfer_id}</code>. You will see the current status (processing, success, or
-                    failed).
-                </p>
+
                 <div class="code-block">
                     <div class="code-label">200 OK <button class="copy-btn" onclick="copyBlock(this)">copy</button>
                     </div>
@@ -1221,9 +1214,7 @@
             </div>
             <div class="endpoint-body">
                 <p>Returns all transfers (interbank + internal) where the specified account is either the
-                    <strong>source</strong> or the <strong>destination</strong>. The response includes a
-                    <code>direction</code> field: <code>"outgoing"</code> (money sent) or <code>"incoming"</code> (money
-                    received).
+                    <strong>source</strong> or the <strong>destination</strong>.
                 </p>
                 <div class="subsection">Query parameters</div>
                 <table>
@@ -1283,9 +1274,7 @@
                 <span class="endpoint-desc">Get account balance (dynamically computed)</span>
             </div>
             <div class="endpoint-body">
-                <p>Returns available and ledger balance for a given account in kobo. Sandbox accounts start with NGN
-                    100,000.00 seed balance. The balance is recomputed in real‑time from all successful transfers (both
-                    interbank and internal).</p>
+                <p>Returns available and ledger balance for a given account in kobo.</p>
                 <div class="code-block">
                     <div class="code-label">Request <button class="copy-btn" onclick="copyBlock(this)">copy</button>
                     </div>
