@@ -15,6 +15,20 @@ const {
 
 router.use(cookieParser());
 
+router.use((req, res, next) => {
+    if (!req.cookies.session_id) {
+        const newSessionId = uuidv4();
+        res.cookie('session_id', newSessionId, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+        req.cookies.session_id = newSessionId;
+    }
+    next();
+});
+
 async function authenticate(req) {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith('Bearer ')) return null;
@@ -47,6 +61,7 @@ async function sendError(req, res, status, code, title, detail, field = null) {
     });
 }
 
+// ========== CUSTOMERS ==========
 router.post('/customers', async (req, res) => {
     const auth = await authenticate(req);
     if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Missing or invalid API key');
@@ -148,6 +163,7 @@ router.get('/customers', async (req, res) => {
     res.json({ data, meta: { total_count: data.length, has_more: false } });
 });
 
+// ========== ACCOUNTS ==========
 router.post('/accounts', async (req, res) => {
     const auth = await authenticate(req);
     if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Invalid API key');
@@ -207,7 +223,6 @@ router.post('/accounts', async (req, res) => {
                 await updateAccountStatus(created.id, 'active', { activated_at: new Date().toISOString() });
                 const sessionId = req.cookies.session_id;
                 const webhookUrl = await getWebhookUrl(sessionId);
-                if (!webhookUrl) console.log(`[Accounts] No webhook URL for session ${sessionId} – skipping activation webhook`);
                 if (webhookUrl) {
                     await fireWebhook('account.activated', {
                         account_id: created.id,
@@ -237,6 +252,7 @@ router.get('/banks', async (req, res) => {
     res.json({ banks });
 });
 
+// ========== NAME ENQUIRY ==========
 router.post('/transfers/name-enquiry', async (req, res) => {
     const auth = await authenticate(req);
     if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Invalid API key');
@@ -282,6 +298,7 @@ router.post('/transfers/name-enquiry', async (req, res) => {
     });
 });
 
+// ========== INTERBANK TRANSFERS ==========
 router.post('/transfers', async (req, res) => {
     const auth = await authenticate(req);
     if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Invalid API key');
@@ -433,6 +450,7 @@ router.get('/wallet-balance', async (req, res) => {
     });
 });
 
+// ========== INTERNAL TRANSFERS ==========
 router.post('/transfers/internal', async (req, res) => {
     const auth = await authenticate(req);
     if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Invalid API key');
@@ -503,8 +521,23 @@ router.post('/transfers/internal', async (req, res) => {
         return sendError(req, res, 500, 'internal-error', 'Internal Server Error', 'Failed to create internal transfer.');
     }
 
-    const responseBody = created;
-    storeIdempotency(idempotencyKey, req.body, responseBody);
+    const destCustomer = await getCustomerById(destAccount.customer_id);
+    const enrichedResponse = {
+        id: created.id,
+        source_account_id: created.source_account_id,
+        destination_account_id: created.destination_account_id,
+        destination_account_number: destAccount.account_number,
+        destination_customer_name: destCustomer ? `${destCustomer.first_name} ${destCustomer.last_name}` : null,
+        destination_bank: 'Qore Bank',
+        amount: created.amount,
+        currency: created.currency,
+        narration: created.narration,
+        status: created.status,
+        created_at: created.created_at,
+        webhook_url: created.webhook_url
+    };
+
+    storeIdempotency(idempotencyKey, req.body, enrichedResponse);
 
     if (currentWebhookUrl) {
         setImmediate(async () => {
@@ -514,6 +547,9 @@ router.post('/transfers/internal', async (req, res) => {
                     status: 'success',
                     amount: amountKobo,
                     currency,
+                    destination_account_id: destination_account_id,
+                    destination_account_number: destAccount.account_number,
+                    destination_customer_name: destCustomer ? `${destCustomer.first_name} ${destCustomer.last_name}` : null,
                     settlement_reference: `INT-${Date.now()}`,
                     completed_at: new Date().toISOString()
                 }, currentWebhookUrl, sessionId);
@@ -523,9 +559,10 @@ router.post('/transfers/internal', async (req, res) => {
         });
     }
 
-    res.status(201).json(created);
+    res.status(201).json(enrichedResponse);
 });
 
+// ========== TRANSACTION HISTORY ==========
 router.get('/transactions', async (req, res) => {
     const auth = await authenticate(req);
     if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Invalid API key');
