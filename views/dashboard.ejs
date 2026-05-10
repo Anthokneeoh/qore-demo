@@ -445,6 +445,13 @@
             vertical-align: bottom;
         }
 
+        .sn-col {
+            color: var(--muted);
+            font-size: 0.75rem;
+            width: 30px;
+            text-align: center;
+        }
+
         @media (max-width: 768px) {
             .topbar {
                 padding: 0 1rem;
@@ -593,6 +600,7 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th style="width: 30px; text-align: center;">#</th>
                                     <th>ID</th>
                                     <th>Amount</th>
                                     <th>Destination</th>
@@ -601,7 +609,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% transfers.slice(-5).reverse().forEach(t=> {
+                                <% transfers.slice(-5).reverse().forEach((t, index)=> {
                                     let destName = t.destination_customer_name || t.destination_account_name;
                                     if (!destName && t.destination_account_id) {
                                     const acct = accounts.find(a => a.id === t.destination_account_id);
@@ -613,6 +621,9 @@
                                     const isInternal = !!t.destination_account_id;
                                     %>
                                     <tr>
+                                        <td class="sn-col">
+                                            <%= index + 1 %>
+                                        </td>
                                         <td class="mono">
                                             <%= t.id %>
                                         </td>
@@ -648,6 +659,7 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th style="width: 30px; text-align: center;">#</th>
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Phone</th>
@@ -658,8 +670,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% customers.forEach(c=> { %>
+                                <% customers.forEach((c, index)=> { %>
                                     <tr>
+                                        <td class="sn-col">
+                                            <%= index + 1 %>
+                                        </td>
                                         <td class="mono">
                                             <%= c.id %>
                                         </td>
@@ -695,6 +710,7 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th style="width: 30px; text-align: center;">#</th>
                                     <th>ID</th>
                                     <th>Account No.</th>
                                     <th>Customer ID</th>
@@ -704,8 +720,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% accounts.forEach(a=> { %>
+                                <% accounts.forEach((a, index)=> { %>
                                     <tr>
+                                        <td class="sn-col">
+                                            <%= index + 1 %>
+                                        </td>
                                         <td class="mono">
                                             <%= a.id %>
                                         </td>
@@ -716,14 +735,14 @@
                                             <%= a.customer_id %>
                                         </td>
                                         <td>
-                                            <%= a.product_code %>
+                                            <%= a.product_code.replace(/_/g, ' ' ) %>
                                         </td>
                                         <td>
                                             <%= a.currency %>
                                         </td>
                                         <td><span
                                                 class="status-pill s-<%= a.status === 'active' ? 'active' : 'pending' %>">
-                                                <%= a.status.replace('_', ' ' ) %>
+                                                <%= a.status.replace(/_/g, ' ' ) %>
                                             </span></td>
                                     </tr>
                                     <% }) %>
@@ -740,6 +759,7 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th style="width: 30px; text-align: center;">#</th>
                                     <th>ID</th>
                                     <th>Amount (NGN)</th>
                                     <th>Destination</th>
@@ -750,7 +770,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% transfers.forEach(t=> {
+                                <% transfers.forEach((t, index)=> {
                                     let destName = t.destination_customer_name || t.destination_account_name;
                                     if (!destName && t.destination_account_id) {
                                     const acct = accounts.find(a => a.id === t.destination_account_id);
@@ -771,6 +791,9 @@
                                     t.id || JSON.stringify(l).includes(t.id)));
                                     %>
                                     <tr>
+                                        <td class="sn-col">
+                                            <%= index + 1 %>
+                                        </td>
                                         <td class="mono">
                                             <%= t.id %>
                                         </td>
@@ -912,6 +935,7 @@
                                                         <table>
                                                             <thead>
                                                                 <tr>
+                                                                    <th style="width: 30px; text-align: center;">#</th>
                                                                     <th>Event</th>
                                                                     <th>URL</th>
                                                                     <th>Status</th>
@@ -920,8 +944,11 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <% webhookLog.forEach(log=> { %>
+                                                                <% webhookLog.forEach((log, index)=> { %>
                                                                     <tr>
+                                                                        <td class="sn-col">
+                                                                            <%= index + 1 %>
+                                                                        </td>
                                                                         <td class="mono">
                                                                             <%= log.event %>
                                                                         </td>
