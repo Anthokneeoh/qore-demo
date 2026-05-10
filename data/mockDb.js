@@ -56,34 +56,55 @@ function storeIdempotency(key, requestBody, response) {
 }
 
 async function getOrCreateAccountName(bankCode, accountNumber) {
+    const normalizedBankCode = String(bankCode).trim();
+    const normalizedAccountNumber = String(accountNumber).trim();
     const { data: existing, error: fetchError } = await supabase
         .from('mock_name_enquiries')
         .select('account_name')
-        .eq('bank_code', bankCode)
-        .eq('account_number', accountNumber)
+        .eq('bank_code', normalizedBankCode)
+        .eq('account_number', normalizedAccountNumber)
         .maybeSingle();
 
-    if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
-
-    if (existing && existing.account_name) {
-        return existing.account_name;
+    if (fetchError) {
+        console.error('[NameEnquiry] Fetch error:', fetchError);
+        throw fetchError;
     }
 
-    const hash = crypto.createHash('md5').update(`${bankCode}:${accountNumber}`).digest('hex');
-    const mockNames = ['Adeola Ogunlesi', 'Ngozi Adeyemi', 'Emeka Okafor', 'Fatima Al-Hassan', 'Chukwuemeka Eze'];
+    if (existing) {
+        return existing.account_name;
+    }
+    const hash = crypto.createHash('md5')
+        .update(`${normalizedBankCode}:${normalizedAccountNumber}`)
+        .digest('hex');
+    const mockNames = [
+        'Adeola Ogunlesi', 'Ngozi Adeyemi', 'Emeka Okafor',
+        'Fatima Al-Hassan', 'Chukwuemeka Eze'
+    ];
     const index = parseInt(hash.slice(0, 8), 16) % mockNames.length;
     const accountName = mockNames[index];
-
     const { error: insertError } = await supabase
         .from('mock_name_enquiries')
-        .insert([{
-            bank_code: bankCode,
-            account_number: accountNumber,
+        .upsert([{
+            bank_code: normalizedBankCode,
+            account_number: normalizedAccountNumber,
             account_name: accountName,
             created_at: new Date().toISOString()
-        }]);
+        }], {
+            onConflict: 'bank_code,account_number'
+        });
 
-    if (insertError) throw insertError;
+    if (insertError) {
+        console.error('[NameEnquiry] Insert error:', insertError);
+        const { data: retryData, error: retryError } = await supabase
+            .from('mock_name_enquiries')
+            .select('account_name')
+            .eq('bank_code', normalizedBankCode)
+            .eq('account_number', normalizedAccountNumber)
+            .maybeSingle();
+        if (retryError) throw retryError;
+        if (retryData) return retryData.account_name;
+        throw insertError;
+    }
 
     return accountName;
 }

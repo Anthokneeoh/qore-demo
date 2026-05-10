@@ -207,6 +207,7 @@ router.post('/accounts', async (req, res) => {
                 await updateAccountStatus(created.id, 'active', { activated_at: new Date().toISOString() });
                 const sessionId = req.cookies.session_id;
                 const webhookUrl = await getWebhookUrl(sessionId);
+                if (!webhookUrl) console.log(`[Accounts] No webhook URL for session ${sessionId} – skipping activation webhook`);
                 if (webhookUrl) {
                     await fireWebhook('account.activated', {
                         account_id: created.id,
@@ -239,6 +240,7 @@ router.get('/banks', async (req, res) => {
 router.post('/transfers/name-enquiry', async (req, res) => {
     const auth = await authenticate(req);
     if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Invalid API key');
+
     const { destination_bank_code, destination_account_number } = req.body;
     if (!destination_bank_code || !destination_account_number)
         return sendError(req, res, 400, 'invalid-request', 'Invalid Request', 'destination_bank_code and destination_account_number are required');
@@ -261,7 +263,15 @@ router.post('/transfers/name-enquiry', async (req, res) => {
         return sendError(req, res, 404, 'not-found', 'Account Not Found',
             'The specified account number was not found in the bank records. Please verify and try again.');
     }
-    const accountName = await getOrCreateAccountName(destination_bank_code, destination_account_number);
+
+    let accountName;
+    try {
+        accountName = await getOrCreateAccountName(destination_bank_code, destination_account_number);
+    } catch (err) {
+        console.error('[NameEnquiry] Failed to resolve name:', err);
+        return sendError(req, res, 500, 'internal-error', 'Internal Server Error',
+            'Could not verify account name. Please try again.');
+    }
 
     res.json({
         account_name: accountName,
