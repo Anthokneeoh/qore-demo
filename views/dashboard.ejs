@@ -558,7 +558,6 @@
 
         <main class="content">
 
-            <!-- OVERVIEW -->
             <div id="section-overview">
                 <h1 class="page-title">Overview</h1>
                 <div class="stats-row">
@@ -611,7 +610,15 @@
                                                 (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
                                         </td>
                                         <td class="mono">
-                                            <%= t.destination_account_number || '–' %>
+                                            <% if (t.destination_account_number) { %>
+                                                <%= t.destination_account_number %>
+                                                    <% } else if (t.destination_customer_name) { %>
+                                                        <%= t.destination_customer_name %>
+                                                            <% } else if (t.destination_account_id) { %>
+                                                                <%= t.destination_account_id %>
+                                                                    <% } else { %>
+                                                                        –
+                                                                        <% } %>
                                         </td>
                                         <td><span class="status-pill s-<%= t.status %>">
                                                 <%= t.status %>
@@ -627,7 +634,6 @@
                 </div>
             </div>
 
-            <!-- CUSTOMERS -->
             <div id="section-customers" style="display:none">
                 <h1 class="page-title">Customers</h1>
                 <div class="card">
@@ -675,7 +681,6 @@
                 </div>
             </div>
 
-            <!-- ACCOUNTS -->
             <div id="section-accounts" style="display:none">
                 <h1 class="page-title">Accounts</h1>
                 <div class="card">
@@ -721,7 +726,6 @@
                 </div>
             </div>
 
-            <!-- TRANSFERS (with Direction column) -->
             <div id="section-transfers" style="display:none">
                 <h1 class="page-title">Transactions</h1>
                 <div class="card">
@@ -748,7 +752,16 @@
                                             <%= (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
                                         </td>
                                         <td class="mono">
-                                            <%= t.destination_account_number || '–' %>
+                                            <% if (t.destination_account_number) { %>
+                                                <%= t.destination_account_number %>
+                                                    <% } else if (t.destination_customer_name) { %>
+                                                        <%= t.destination_customer_name %> <span class="mono"
+                                                                style="color:var(--muted)">(Qore Bank)</span>
+                                                            <% } else if (t.destination_account_id) { %>
+                                                                <%= t.destination_account_id %>
+                                                                    <% } else { %>
+                                                                        –
+                                                                        <% } %>
                                         </td>
                                         <td><span class="status-pill s-<%= t.status %>">
                                                 <%= t.status %>
@@ -780,7 +793,6 @@
                 </div>
             </div>
 
-            <!-- DEVELOPER / API KEYS -->
             <div id="section-developer" style="display:none">
                 <h1 class="page-title">API Keys</h1>
 
@@ -815,7 +827,6 @@
                         </div>
             </div>
 
-            <!-- WEBHOOKS -->
             <div id="section-webhooks" style="display:none">
                 <h1 class="page-title">Webhook Settings</h1>
 
@@ -994,30 +1005,17 @@
 
         function showSection(name, element) {
             const target = document.getElementById('section-' + name);
-
             if (!target) {
                 console.error('Missing section:', name);
                 return;
             }
-
-            document.querySelectorAll('[id^="section-"]').forEach(s => {
-                s.style.display = 'none';
-            });
-
+            document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
             target.style.display = 'block';
-
-            document.querySelectorAll('.nav-item').forEach(n => {
-                n.classList.remove('active');
-            });
-
-            if (element) {
-                element.classList.add('active');
-            }
-
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
             if (window.innerWidth <= 768) {
                 document.querySelector('.sidebar').classList.remove('open');
             }
-
             const cleanUrl = window.location.pathname + '?tab=' + name;
             window.history.replaceState(null, '', cleanUrl);
         }
@@ -1028,27 +1026,29 @@
             const statusSpan = document.createElement('span');
             statusSpan.className = `status-pill s-${tx.status}`;
             statusSpan.textContent = tx.status;
-
             const statusContainer = document.getElementById('modalStatusContainer');
             statusContainer.innerHTML = '';
             statusContainer.appendChild(statusSpan);
 
             document.getElementById('modalAmount').textContent = `NGN ${(tx.amount / 100).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
-
             document.getElementById('modalSource').textContent = tx.source_account_id || '–';
 
-            const bankMap = {
-                '044': 'Access Bank',
-                '011': 'First Bank of Nigeria',
-                '058': 'GTBank',
-                '033': 'UBA',
-                '050': 'Ecobank Nigeria'
-            };
-            const destBankName = bankMap[tx.destination_bank_code] || tx.destination_bank_code || '–';
-            document.getElementById('modalBank').textContent = destBankName;
+            let destBank = tx.destination_bank;
+            if (!destBank && tx.destination_bank_code) {
+                const bankMap = {
+                    '044': 'Access Bank',
+                    '011': 'First Bank of Nigeria',
+                    '058': 'GTBank',
+                    '033': 'UBA',
+                    '050': 'Ecobank Nigeria'
+                };
+                destBank = bankMap[tx.destination_bank_code] || tx.destination_bank_code;
+            }
+            document.getElementById('modalBank').textContent = destBank || '–';
 
-            document.getElementById('modalDestAcct').textContent = tx.destination_account_number || '–';
-            document.getElementById('modalDestName').textContent = tx.destination_account_name || '–';
+            const destDisplay = tx.destination_account_number || tx.destination_customer_name || tx.destination_account_id || '–';
+            document.getElementById('modalDestAcct').textContent = destDisplay;
+            document.getElementById('modalDestName').textContent = tx.destination_account_name || tx.destination_customer_name || '–';
             document.getElementById('modalNarration').textContent = tx.narration || '–';
 
             document.getElementById('txModal').showModal();
@@ -1061,15 +1061,12 @@
                     btn.textContent = 'copied!';
                     setTimeout(() => btn.textContent = 'copy', 2000);
                 })
-                .catch(() => {
-                    alert('Copy failed. Please copy manually.');
-                });
+                .catch(() => alert('Copy failed. Please copy manually.'));
         }
 
         function copyWebhookUrl(btn) {
             const input = document.querySelector('.webhook-input');
             const feedback = document.getElementById('webhook-copy-feedback');
-
             navigator.clipboard.writeText(input.value)
                 .then(() => {
                     btn.textContent = 'Copied!';
@@ -1079,9 +1076,7 @@
                         if (feedback) feedback.style.display = 'none';
                     }, 2000);
                 })
-                .catch(() => {
-                    alert('Copy failed. Please copy manually.');
-                });
+                .catch(() => alert('Copy failed. Please copy manually.'));
         }
     </script>
 </body>
