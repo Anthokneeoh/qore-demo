@@ -558,413 +558,403 @@
 
         <main class="content">
 
-            <% // HELPER FUNCTION: Recursively finds the correct customer name by joining accounts & customers function
-                resolveDestName(t) { if (t.destination_customer_name) return t.destination_customer_name; if
-                (t.destination_account_name) return t.destination_account_name; if (t.destination_account_id) { const
-                acct=accounts.find(a=> a.id === t.destination_account_id);
-                if (acct) {
-                const cust = customers.find(c => c.id === acct.customer_id);
-                if (cust) {
-                return cust.first_name + ' ' + cust.last_name;
-                }
-                }
-                }
-                return null;
-                }
-                %>
-
-                <div id="section-overview">
-                    <h1 class="page-title">Overview</h1>
-                    <div class="stats-row">
-                        <div class="stat-card">
-                            <div class="stat-label">Customers</div>
-                            <div class="stat-num">
-                                <%= customers.length %>
-                            </div>
-                            <div class="stat-sub">Registered entities</div>
+            <div id="section-overview">
+                <h1 class="page-title">Overview</h1>
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-label">Customers</div>
+                        <div class="stat-num">
+                            <%= customers.length %>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Accounts</div>
-                            <div class="stat-num">
-                                <%= accounts.length %>
-                            </div>
-                            <div class="stat-sub">
-                                <%= accounts.filter(a=>a.status==='active').length %> active
-                            </div>
+                        <div class="stat-sub">Registered entities</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Accounts</div>
+                        <div class="stat-num">
+                            <%= accounts.length %>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Transactions</div>
-                            <div class="stat-num">
-                                <%= transfers.length %>
-                            </div>
-                            <div class="stat-sub">
-                                <%= transfers.filter(t=>t.status==='success').length %> successful
-                            </div>
+                        <div class="stat-sub">
+                            <%= accounts.filter(a=>a.status==='active').length %> active
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="card-header"><span class="card-title">Recent Transactions</span></div>
-                        <div class="card-body" style="padding:0">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Amount</th>
-                                        <th>Destination</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% transfers.slice(-5).reverse().forEach(t=> {
-                                        const destName = resolveDestName(t);
-                                        const isInternal = !!t.destination_account_id;
-                                        %>
-                                        <tr>
-                                            <td class="mono">
-                                                <%= t.id %>
-                                            </td>
-                                            <td class="amount-cell">NGN <%=
-                                                    (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
-                                            </td>
-                                            <td class="mono">
-                                                <% if (isInternal) { %>
-                                                    <%= destName || t.destination_account_id %> <span
-                                                            style="color:var(--muted);font-size:0.75rem">(Qore
-                                                            Bank)</span>
-                                                        <% } else { %>
-                                                            <%= t.destination_account_number || '–' %>
-                                                                <% } %>
-                                            </td>
-                                            <td><span class="status-pill s-<%= t.status %>">
-                                                    <%= t.status %>
-                                                </span></td>
-                                            <td>
-                                                <%= new Date(t.created_at).toLocaleDateString() %>
-                                            </td>
-                                        </tr>
-                                        <% }) %>
-                                </tbody>
-                            </table>
+                    <div class="stat-card">
+                        <div class="stat-label">Transactions</div>
+                        <div class="stat-num">
+                            <%= transfers.length %>
+                        </div>
+                        <div class="stat-sub">
+                            <%= transfers.filter(t=>t.status==='success').length %> successful
                         </div>
                     </div>
                 </div>
-
-                <div id="section-customers" style="display:none">
-                    <h1 class="page-title">Customers</h1>
-                    <div class="card">
-                        <div class="card-body" style="padding:0">
-                            <table>
-                                <thead>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Recent Transactions</span></div>
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Amount</th>
+                                    <th>Destination</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% transfers.slice(-5).reverse().forEach(t=> {
+                                    let destName = t.destination_customer_name || t.destination_account_name;
+                                    if (!destName && t.destination_account_id) {
+                                    const acct = accounts.find(a => a.id === t.destination_account_id);
+                                    if (acct) {
+                                    const cust = customers.find(c => c.id === acct.customer_id);
+                                    if (cust) { destName = cust.first_name + ' ' + cust.last_name; }
+                                    }
+                                    }
+                                    const isInternal = !!t.destination_account_id;
+                                    %>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Phone</th>
-                                        <th>Email</th>
-                                        <th>KYC Tier</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
+                                        <td class="mono">
+                                            <%= t.id %>
+                                        </td>
+                                        <td class="amount-cell">NGN <%=
+                                                (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
+                                        </td>
+                                        <td class="mono">
+                                            <% if (isInternal) { %>
+                                                <%= destName || t.destination_account_id %> <span
+                                                        style="color:var(--muted);font-size:0.75rem">(Qore Bank)</span>
+                                                    <% } else { %>
+                                                        <%= t.destination_account_number || '–' %>
+                                                            <% } %>
+                                        </td>
+                                        <td><span class="status-pill s-<%= t.status %>">
+                                                <%= t.status %>
+                                            </span></td>
+                                        <td>
+                                            <%= new Date(t.created_at).toLocaleDateString() %>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <% customers.forEach(c=> { %>
-                                        <tr>
-                                            <td class="mono">
-                                                <%= c.id %>
-                                            </td>
-                                            <td>
-                                                <%= c.first_name %>
-                                                    <%= c.last_name %>
-                                            </td>
-                                            <td class="mono">
-                                                <%= c.phone_number %>
-                                            </td>
-                                            <td>
-                                                <%= c.email %>
-                                            </td>
-                                            <td style="text-align:center">
-                                                <%= c.kyc_tier %>
-                                            </td>
-                                            <td><span class="status-pill s-active">active</span></td>
-                                            <td>
-                                                <%= new Date(c.created_at).toLocaleDateString() %>
-                                            </td>
-                                        </tr>
-                                        <% }) %>
-                                </tbody>
-                            </table>
-                        </div>
+                                    <% }) %>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                <div id="section-accounts" style="display:none">
-                    <h1 class="page-title">Accounts</h1>
-                    <div class="card">
-                        <div class="card-body" style="padding:0">
-                            <table>
-                                <thead>
+            <div id="section-customers" style="display:none">
+                <h1 class="page-title">Customers</h1>
+                <div class="card">
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>KYC Tier</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% customers.forEach(c=> { %>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Account No.</th>
-                                        <th>Customer ID</th>
-                                        <th>Product</th>
-                                        <th>Currency</th>
-                                        <th>Status</th>
+                                        <td class="mono">
+                                            <%= c.id %>
+                                        </td>
+                                        <td>
+                                            <%= c.first_name %>
+                                                <%= c.last_name %>
+                                        </td>
+                                        <td class="mono">
+                                            <%= c.phone_number %>
+                                        </td>
+                                        <td>
+                                            <%= c.email %>
+                                        </td>
+                                        <td style="text-align:center">
+                                            <%= c.kyc_tier %>
+                                        </td>
+                                        <td><span class="status-pill s-active">active</span></td>
+                                        <td>
+                                            <%= new Date(c.created_at).toLocaleDateString() %>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <% accounts.forEach(a=> { %>
-                                        <tr>
-                                            <td class="mono">
-                                                <%= a.id %>
-                                            </td>
-                                            <td class="mono">
-                                                <%= a.account_number %>
-                                            </td>
-                                            <td class="mono">
-                                                <%= a.customer_id %>
-                                            </td>
-                                            <td>
-                                                <%= a.product_code %>
-                                            </td>
-                                            <td>
-                                                <%= a.currency %>
-                                            </td>
-                                            <td><span
-                                                    class="status-pill s-<%= a.status === 'active' ? 'active' : 'pending' %>">
-                                                    <%= a.status.replace('_', ' ' ) %>
-                                                </span></td>
-                                        </tr>
-                                        <% }) %>
-                                </tbody>
-                            </table>
-                        </div>
+                                    <% }) %>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                <div id="section-transfers" style="display:none">
-                    <h1 class="page-title">Transactions</h1>
-                    <div class="card">
-                        <div class="card-body" style="padding:0">
-                            <table>
-                                <thead>
+            <div id="section-accounts" style="display:none">
+                <h1 class="page-title">Accounts</h1>
+                <div class="card">
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Account No.</th>
+                                    <th>Customer ID</th>
+                                    <th>Product</th>
+                                    <th>Currency</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% accounts.forEach(a=> { %>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Amount (NGN)</th>
-                                        <th>Destination</th>
-                                        <th>Status</th>
-                                        <th>Direction</th>
-                                        <th>View</th>
-                                        <th>Resend Webhook</th>
+                                        <td class="mono">
+                                            <%= a.id %>
+                                        </td>
+                                        <td class="mono">
+                                            <%= a.account_number %>
+                                        </td>
+                                        <td class="mono">
+                                            <%= a.customer_id %>
+                                        </td>
+                                        <td>
+                                            <%= a.product_code %>
+                                        </td>
+                                        <td>
+                                            <%= a.currency %>
+                                        </td>
+                                        <td><span
+                                                class="status-pill s-<%= a.status === 'active' ? 'active' : 'pending' %>">
+                                                <%= a.status.replace('_', ' ' ) %>
+                                            </span></td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <% transfers.forEach(t=> {
-                                        const destName = resolveDestName(t);
-                                        const isInternal = !!t.destination_account_id;
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                                        // Inject resolved data for the modal to use
-                                        const txForModal = Object.assign({}, t);
-                                        if (isInternal) {
-                                        txForModal._resolvedBank = "Qore Bank";
-                                        txForModal._resolvedName = destName;
-                                        }
+            <div id="section-transfers" style="display:none">
+                <h1 class="page-title">Transactions</h1>
+                <div class="card">
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Amount (NGN)</th>
+                                    <th>Destination</th>
+                                    <th>Status</th>
+                                    <th>Direction</th>
+                                    <th>View</th>
+                                    <th>Resend Webhook</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% transfers.forEach(t=> {
+                                    let destName = t.destination_customer_name || t.destination_account_name;
+                                    if (!destName && t.destination_account_id) {
+                                    const acct = accounts.find(a => a.id === t.destination_account_id);
+                                    if (acct) {
+                                    const cust = customers.find(c => c.id === acct.customer_id);
+                                    if (cust) { destName = cust.first_name + ' ' + cust.last_name; }
+                                    }
+                                    }
+                                    const isInternal = !!t.destination_account_id;
 
-                                        // Robust check: if the transfer ID is buried in the webhook payload somewhere,
-                                        this stringify logic will definitely find it
-                                        const log = webhookLog.find(l => l.transferId === t.id || l.transfer_id === t.id
-                                        || JSON.stringify(l).includes(t.id));
-                                        %>
-                                        <tr>
-                                            <td class="mono">
-                                                <%= t.id %>
-                                            </td>
-                                            <td class="amount-cell">
-                                                <%= (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
-                                            </td>
-                                            <td class="mono">
-                                                <% if (isInternal) { %>
-                                                    <%= destName || t.destination_account_id %> <br><span
-                                                            style="color:var(--muted);font-size:0.75rem">(Qore
-                                                            Bank)</span>
-                                                        <% } else { %>
-                                                            <%= t.destination_account_number || '–' %>
-                                                                <% } %>
-                                            </td>
-                                            <td><span class="status-pill s-<%= t.status %>">
-                                                    <%= t.status %>
-                                                </span></td>
-                                            <td>
-                                                <% if (isInternal) { %>
+                                    const txForModal = Object.assign({}, t);
+                                    if (isInternal) {
+                                    txForModal._resolvedBank = "Qore Bank";
+                                    txForModal._resolvedName = destName;
+                                    }
+
+                                    const log = webhookLog.find(l => l && (l.transferId === t.id || l.transfer_id ===
+                                    t.id || JSON.stringify(l).includes(t.id)));
+                                    %>
+                                    <tr>
+                                        <td class="mono">
+                                            <%= t.id %>
+                                        </td>
+                                        <td class="amount-cell">
+                                            <%= (t.amount/100).toLocaleString('en-NG',{minimumFractionDigits:2}) %>
+                                        </td>
+                                        <td class="mono">
+                                            <% if (isInternal) { %>
+                                                <%= destName || t.destination_account_id %> <br><span
+                                                        style="color:var(--muted);font-size:0.75rem">(Qore Bank)</span>
+                                                    <% } else { %>
+                                                        <%= t.destination_account_number || '–' %>
+                                                            <% } %>
+                                        </td>
+                                        <td><span class="status-pill s-<%= t.status %>">
+                                                <%= t.status %>
+                                            </span></td>
+                                        <td>
+                                            <% if (isInternal) { %>
+                                                <span class="status-pill"
+                                                    style="background:#E0F2FE; color:#0369A1">Internal</span>
+                                                <% } else { %>
                                                     <span class="status-pill"
-                                                        style="background:#E0F2FE; color:#0369A1">Internal</span>
-                                                    <% } else { %>
-                                                        <span class="status-pill"
-                                                            style="background:#FEF3C7; color:#92400E">Outbound</span>
-                                                        <% } %>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-ghost view-btn"
-                                                    data-tx="<%= encodeURIComponent(JSON.stringify(txForModal)) %>">View</button>
-                                            </td>
-                                            <td>
-                                                <% if (log) { %>
-                                                    <form method="POST"
-                                                        action="/dashboard/resend-webhook/<%= log.webhookId || log.id %>"
-                                                        style="display:inline">
-                                                        <button type="submit" class="btn btn-sm btn-ghost">↺
-                                                            Resend</button>
-                                                    </form>
-                                                    <% } else { %>
-                                                        <span style="font-size:0.75rem;color:var(--muted)">No
-                                                            webhook</span>
-                                                        <% } %>
-                                            </td>
-                                        </tr>
-                                        <% }) %>
-                                </tbody>
-                            </table>
-                        </div>
+                                                        style="background:#FEF3C7; color:#92400E">Outbound</span>
+                                                    <% } %>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-ghost view-btn"
+                                                data-tx="<%= encodeURIComponent(JSON.stringify(txForModal)) %>">View</button>
+                                        </td>
+                                        <td>
+                                            <% if (log) { %>
+                                                <form method="POST"
+                                                    action="/dashboard/resend-webhook/<%= log.webhookId || log.id %>"
+                                                    style="display:inline">
+                                                    <button type="submit" class="btn btn-sm btn-ghost">↺
+                                                        Resend</button>
+                                                </form>
+                                                <% } else { %>
+                                                    <span style="font-size:0.75rem;color:var(--muted)">No
+                                                        webhook</span>
+                                                    <% } %>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                <div id="section-developer" style="display:none">
-                    <h1 class="page-title">API Keys</h1>
+            <div id="section-developer" style="display:none">
+                <h1 class="page-title">API Keys</h1>
 
-                    <% if (typeof query !=='undefined' && query.key_updated) { %>
-                        <div class="feedback feedback-ok">✓ Test API Key regenerated successfully. Old key is revoked.
-                        </div>
-                        <% } %>
+                <% if (typeof query !=='undefined' && query.key_updated) { %>
+                    <div class="feedback feedback-ok">✓ Test API Key regenerated successfully. Old key is revoked.</div>
+                    <% } %>
 
-                            <div class="card">
-                                <div class="card-header">
-                                    <span class="card-title">Your keys</span>
-                                    <form method="POST" action="/dashboard/generate-key">
-                                        <button type="submit" class="btn btn-ghost btn-sm">↺ Regenerate test
-                                            key</button>
-                                    </form>
-                                </div>
-                                <div class="card-body">
-                                    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">
-                                        Only <strong>test keys</strong> (sk_test_) work in this sandbox environment.
-                                        Live keys are shown for reference only and will return 401.
-                                    </p>
-                                    <% apiKeys.forEach(k=> { %>
-                                        <div class="key-row">
-                                            <span class="key-type <%= k.type === 'test' ? 'key-test' : 'key-live' %>">
-                                                <%= k.type %>
-                                            </span>
-                                            <input class="key-val <%= k.type !== 'test' ? 'key-inactive' : '' %>"
-                                                id="key-<%= k.type %>" value="<%= k.key %>" readonly>
-                                            <button class="btn btn-ghost btn-sm"
-                                                onclick="copyKey('<%= k.type %>', this)">copy</button>
-                                        </div>
-                                        <% }) %>
-                                </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">Your keys</span>
+                                <form method="POST" action="/dashboard/generate-key">
+                                    <button type="submit" class="btn btn-ghost btn-sm">↺ Regenerate test key</button>
+                                </form>
                             </div>
-                </div>
+                            <div class="card-body">
+                                <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">
+                                    Only <strong>test keys</strong> (sk_test_) work in this sandbox environment.
+                                    Live keys are shown for reference only and will return 401.
+                                </p>
+                                <% apiKeys.forEach(k=> { %>
+                                    <div class="key-row">
+                                        <span class="key-type <%= k.type === 'test' ? 'key-test' : 'key-live' %>">
+                                            <%= k.type %>
+                                        </span>
+                                        <input class="key-val <%= k.type !== 'test' ? 'key-inactive' : '' %>"
+                                            id="key-<%= k.type %>" value="<%= k.key %>" readonly>
+                                        <button class="btn btn-ghost btn-sm"
+                                            onclick="copyKey('<%= k.type %>', this)">copy</button>
+                                    </div>
+                                    <% }) %>
+                            </div>
+                        </div>
+            </div>
 
-                <div id="section-webhooks" style="display:none">
-                    <h1 class="page-title">Webhook Settings</h1>
+            <div id="section-webhooks" style="display:none">
+                <h1 class="page-title">Webhook Settings</h1>
 
-                    <% if (typeof query !=='undefined' && query.saved) { %>
-                        <div class="feedback feedback-ok">✓ Webhook URL saved successfully.</div>
-                        <% } %>
-                            <% if (typeof query !=='undefined' && query.resent) { %>
-                                <div class="feedback feedback-ok">✓ Webhook payload resent successfully.</div>
-                                <% } %>
-                                    <% if (typeof query !=='undefined' && query.error==='invalid_url' ) { %>
-                                        <div class="feedback feedback-err">✗ Invalid URL — must start with http:// or
-                                            https://</div>
-                                        <% } %>
+                <% if (typeof query !=='undefined' && query.saved) { %>
+                    <div class="feedback feedback-ok">✓ Webhook URL saved successfully.</div>
+                    <% } %>
+                        <% if (typeof query !=='undefined' && query.resent) { %>
+                            <div class="feedback feedback-ok">✓ Webhook payload resent successfully.</div>
+                            <% } %>
+                                <% if (typeof query !=='undefined' && query.error==='invalid_url' ) { %>
+                                    <div class="feedback feedback-err">✗ Invalid URL — must start with http:// or
+                                        https://</div>
+                                    <% } %>
 
-                                            <div class="card">
-                                                <div class="card-header"><span class="card-title">Endpoint URL</span>
-                                                </div>
-                                                <div class="card-body">
-                                                    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">
-                                                        Qore sends <code>transfer.completed</code>,
-                                                        <code>transfer.failed</code>, and
-                                                        <code>account.activated</code> events to this URL.
-                                                        Use <a href="https://webhook.site" target="_blank"
-                                                            style="color:var(--green)">webhook.site</a> for testing.
-                                                    </p>
-                                                    <form method="POST" action="/dashboard/webhook"
-                                                        class="webhook-form">
-                                                        <input type="url" name="url" class="webhook-input"
-                                                            placeholder="https://webhook.site/your-unique-url"
-                                                            value="<%= webhookUrl %>" pattern="https?://.*"
-                                                            title="URL must start with http:// or https://" required>
-                                                        <button type="submit" class="btn btn-primary">Save URL</button>
-                                                        <% if (webhookUrl) { %>
-                                                            <button type="button" class="btn btn-ghost"
-                                                                id="copy-webhook-btn"
-                                                                onclick="copyWebhookUrl(this)">Copy</button>
-                                                            <% } %>
-                                                    </form>
-                                                    <div id="webhook-copy-feedback" class="feedback feedback-ok"
-                                                        style="display:none; margin-top: 1rem; margin-bottom: 0;">✓ URL
-                                                        copied to clipboard</div>
-                                                </div>
+                                        <div class="card">
+                                            <div class="card-header"><span class="card-title">Endpoint URL</span></div>
+                                            <div class="card-body">
+                                                <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">
+                                                    Qore sends <code>transfer.completed</code>,
+                                                    <code>transfer.failed</code>, and
+                                                    <code>account.activated</code> events to this URL.
+                                                    Use <a href="https://webhook.site" target="_blank"
+                                                        style="color:var(--green)">webhook.site</a> for testing.
+                                                </p>
+                                                <form method="POST" action="/dashboard/webhook" class="webhook-form">
+                                                    <input type="url" name="url" class="webhook-input"
+                                                        placeholder="https://webhook.site/your-unique-url"
+                                                        value="<%= webhookUrl %>" pattern="https?://.*"
+                                                        title="URL must start with http:// or https://" required>
+                                                    <button type="submit" class="btn btn-primary">Save URL</button>
+                                                    <% if (webhookUrl) { %>
+                                                        <button type="button" class="btn btn-ghost"
+                                                            id="copy-webhook-btn"
+                                                            onclick="copyWebhookUrl(this)">Copy</button>
+                                                        <% } %>
+                                                </form>
+                                                <div id="webhook-copy-feedback" class="feedback feedback-ok"
+                                                    style="display:none; margin-top: 1rem; margin-bottom: 0;">✓ URL
+                                                    copied to clipboard</div>
                                             </div>
+                                        </div>
 
-                                            <div class="card" style="margin-top:1.5rem">
-                                                <div class="card-header"><span class="card-title">Recent delivery
-                                                        attempts</span></div>
-                                                <div class="card-body" style="padding:0">
-                                                    <% if (webhookLog.length===0) { %>
-                                                        <div
-                                                            style="padding:1.5rem;text-align:center;color:var(--muted);font-size:0.875rem">
-                                                            No webhook deliveries yet. Initiate a transfer to generate
-                                                            events.
-                                                        </div>
-                                                        <% } else { %>
-                                                            <table>
-                                                                <thead>
+                                        <div class="card" style="margin-top:1.5rem">
+                                            <div class="card-header"><span class="card-title">Recent delivery
+                                                    attempts</span></div>
+                                            <div class="card-body" style="padding:0">
+                                                <% if (webhookLog.length===0) { %>
+                                                    <div
+                                                        style="padding:1.5rem;text-align:center;color:var(--muted);font-size:0.875rem">
+                                                        No webhook deliveries yet. Initiate a transfer to generate
+                                                        events.
+                                                    </div>
+                                                    <% } else { %>
+                                                        <table>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Event</th>
+                                                                    <th>URL</th>
+                                                                    <th>Status</th>
+                                                                    <th>Time</th>
+                                                                    <th>Resend</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <% webhookLog.forEach(log=> { %>
                                                                     <tr>
-                                                                        <th>Event</th>
-                                                                        <th>URL</th>
-                                                                        <th>Status</th>
-                                                                        <th>Time</th>
-                                                                        <th>Resend</th>
+                                                                        <td class="mono">
+                                                                            <%= log.event %>
+                                                                        </td>
+                                                                        <td class="mono"><span class="text-truncate"
+                                                                                title="<%= log.url %>">
+                                                                                <%= log.url %>
+                                                                            </span></td>
+                                                                        <td><span
+                                                                                class="status-pill s-<%= log.status === 'delivered' ? 'success' : 'failed' %>">
+                                                                                <%= log.status %>
+                                                                            </span></td>
+                                                                        <td>
+                                                                            <%= new
+                                                                                Date(log.attemptedAt).toLocaleTimeString()
+                                                                                %>
+                                                                        </td>
+                                                                        <td>
+                                                                            <form method="POST"
+                                                                                action="/dashboard/resend-webhook/<%= log.webhookId %>"
+                                                                                style="display:inline">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-sm btn-ghost">↺
+                                                                                    Resend</button>
+                                                                            </form>
+                                                                        </td>
                                                                     </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <% webhookLog.forEach(log=> { %>
-                                                                        <tr>
-                                                                            <td class="mono">
-                                                                                <%= log.event %>
-                                                                            </td>
-                                                                            <td class="mono"><span class="text-truncate"
-                                                                                    title="<%= log.url %>">
-                                                                                    <%= log.url %>
-                                                                                </span></td>
-                                                                            <td><span
-                                                                                    class="status-pill s-<%= log.status === 'delivered' ? 'success' : 'failed' %>">
-                                                                                    <%= log.status %>
-                                                                                </span></td>
-                                                                            <td>
-                                                                                <%= new
-                                                                                    Date(log.attemptedAt).toLocaleTimeString()
-                                                                                    %>
-                                                                            </td>
-                                                                            <td>
-                                                                                <form method="POST"
-                                                                                    action="/dashboard/resend-webhook/<%= log.webhookId %>"
-                                                                                    style="display:inline">
-                                                                                    <button type="submit"
-                                                                                        class="btn btn-sm btn-ghost">↺
-                                                                                        Resend</button>
-                                                                                </form>
-                                                                            </td>
-                                                                        </tr>
-                                                                        <% }) %>
-                                                                </tbody>
-                                                            </table>
-                                                            <% } %>
-                                                </div>
+                                                                    <% }) %>
+                                                            </tbody>
+                                                        </table>
+                                                        <% } %>
                                             </div>
-                </div>
+                                        </div>
+            </div>
         </main>
     </div>
 
