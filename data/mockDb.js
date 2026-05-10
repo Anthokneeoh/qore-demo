@@ -370,6 +370,17 @@ async function setWebhookUrl(sessionId, url) {
     return data?.[0] || null;
 }
 
+async function getCustomerByBvn(bvn) {
+    if (!bvn) return null;
+    const { data, error } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('bvn', bvn)
+        .limit(1);
+    if (error) throw error;
+    return data?.[0] || null;
+}
+
 module.exports = {
     getCustomers,
     createCustomer,
@@ -389,5 +400,6 @@ module.exports = {
     setWebhookUrl,
     checkIdempotency,
     storeIdempotency,
-    getOrCreateAccountName
+    getOrCreateAccountName,
+    getCustomerByBvn
 };

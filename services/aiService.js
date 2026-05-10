@@ -2,14 +2,18 @@ const { GoogleGenAI } = require('@google/genai');
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-async function getAIHint(errorCode, field, endpoint) {
+async function getAIHint(errorCode, field, detail, endpoint) {
     const prompt = `You are an API integration assistant for a Nigerian fintech platform called Qore.
-A developer received this error while calling the API.
+A developer received this error:
 Error code: ${errorCode}
 Field: ${field || 'none'}
+Detail: ${detail}
 Endpoint: ${endpoint}
-Write a single helpful correction hint in under 150 characters. Be specific.
-Nigerian context: phone numbers use E.164 (+234...), amounts are in kobo (500000 = NGN 5000), BVN is 11 digits.
+Write a single helpful correction hint in under 150 characters. Be specific to the Detail.
+Examples:
+- If Detail says "Email already registered" → "Email already exists. Use a different email address."
+- If Detail says "Phone already registered" → "Phone number already registered. Use a different number or retrieve existing customer."
+- If Detail says "BVN is already registered" → "BVN must be unique. This BVN belongs to another customer."
 Reply with ONLY the hint text. No preamble.`;
 
     try {

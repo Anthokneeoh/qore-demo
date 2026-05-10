@@ -9,7 +9,8 @@ const {
     getAccounts, createAccount, getAccountById, updateAccountStatus,
     getTransfers, getTransferById, createTransfer, updateTransferStatus,
     getApiKeyByKey, checkIdempotency, storeIdempotency,
-    getOrCreateAccountName, getWebhookUrl
+    getOrCreateAccountName, getWebhookUrl,
+    getCustomerByBvn
 } = require('../data/mockDb');
 
 router.use(cookieParser());
@@ -27,9 +28,9 @@ async function sendError(req, res, status, code, title, detail, field = null) {
     let aiHint = null;
     if (status >= 400 && status < 500) {
         try {
-            aiHint = await getAIHint(code, field, `${req.method} ${req.path}`);
-        } catch (aiError) {
-            console.error('[AI Service Error]: Failed to generate hint', aiError.message);
+            aiHint = await getAIHint(code, field, detail, `${req.method} ${req.path}`);
+        } catch (err) {
+            console.error('[AI] Hint failed:', err);
             aiHint = "AI hint generation temporarily unavailable.";
         }
     }
@@ -73,14 +74,48 @@ router.post('/customers', async (req, res) => {
     if (!/^\+234\d{10}$/.test(phone_number))
         return sendError(req, res, 400, 'invalid-request', 'Invalid Request', 'Phone must be E.164: +234XXXXXXXXXX', 'phone_number');
 
+    const ALLOWED_GENDERS = ['male', 'female', 'other', 'non-binary'];
+    if (gender && !ALLOWED_GENDERS.includes(gender.toLowerCase())) {
+        return sendError(req, res, 400, 'invalid-request', 'Invalid Request',
+            `Gender must be one of: ${ALLOWED_GENDERS.join(', ')}`, 'gender');
+    }
+
     const existing = await getCustomers({ email });
-    if (existing.length) return sendError(req, res, 409, 'conflict', 'Conflict', 'Email already registered');
+    if (existing.length) return sendError(req, res, 409, 'conflict', 'Conflict', 'Email already registered', 'email');
 
     const existingPhone = await getCustomers({ phone: phone_number });
     if (existingPhone.length) return sendError(req, res, 409, 'conflict', 'Conflict', 'Phone already registered', 'phone_number');
 
     if (bvn && !/^\d{11}$/.test(bvn))
         return sendError(req, res, 422, 'unprocessable', 'Unprocessable', 'BVN must be 11 digits', 'bvn');
+
+    if (bvn) {
+        const existingByBvn = await getCustomerByBvn(bvn);
+        if (existingByBvn) {
+            return sendError(req, res, 409, 'conflict', 'Conflict',
+                'BVN is already registered to another customer. BVN must be unique.', 'bvn');
+        }
+    }
+
+    if (date_of_birth) {
+        const birthDate = new Date(date_of_birth);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--;
+        if (isNaN(birthDate.getTime())) {
+            return sendError(req, res, 400, 'invalid-request', 'Invalid Request',
+                'Invalid date_of_birth format. Use YYYY-MM-DD.', 'date_of_birth');
+        }
+        if (birthDate > today) {
+            return sendError(req, res, 400, 'invalid-request', 'Invalid Request',
+                'Date of birth cannot be in the future.', 'date_of_birth');
+        }
+        if (age < 18) {
+            return sendError(req, res, 400, 'invalid-request', 'Invalid Request',
+                'Customer must be at least 18 years old.', 'date_of_birth');
+        }
+    }
 
     const newCustomer = {
         id: `cus_${uuidv4().slice(0, 8)}`,
