@@ -26,6 +26,7 @@
             --post: #12A372;
             --get: #0077CC;
             --radius: 8px;
+            --red: #DC2626;
         }
 
         * {
@@ -229,6 +230,7 @@
             display: flex;
             gap: 0.75rem;
             margin-top: 1.5rem;
+            flex-wrap: wrap;
         }
 
         .btn-primary {
@@ -255,6 +257,7 @@
             font-weight: 500;
             text-decoration: none;
             font-size: 0.9rem;
+            cursor: pointer;
         }
 
         /* SCROLL MARGIN OFFSETS FOR STICKY HEADERS */
@@ -710,10 +713,15 @@
                 <span id="baseUrl">https://qore-demo.vercel.app</span>
                 <button class="copy-btn" onclick="copyText('baseUrl', this)">copy</button>
             </div>
+
             <div class="cta-row">
                 <a href="/dashboard/login" class="btn-primary">Get your API key →</a>
-                <a href="/dashboard" class="btn-outline">View dashboard</a>
+                <a href="/dashboard" target="_blank" class="btn-outline">View dashboard</a>
+                <button onclick="downloadPostman()" class="btn-outline">
+                    📥 Download Postman Collection
+                </button>
             </div>
+
         </div>
 
         <h2 class="section-title" id="auth">Authentication</h2>
@@ -1187,19 +1195,35 @@
                 <span class="endpoint-desc">Fetch a single transfer by ID</span>
             </div>
             <div class="endpoint-body">
-                <p>Use this endpoint to poll the status of a specific transfer when webhooks are not available. The
-                    <code>:id</code> is the <code>transfer_id</code> returned from POST /v1/transfers.
-                </p>
+                <p>Use this endpoint to poll the status of a specific transfer when webhooks are not available.</p>
+
+                <div class="subsection">Path parameters</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>id</code> <span style="color:var(--red);font-size:0.7rem;">REQUIRED</span></td>
+                            <td>string</td>
+                            <td>The unique <code>transfer_id</code> returned from the POST /v1/transfers endpoint.</td>
+                        </tr>
+                    </tbody>
+                </table>
 
                 <div class="code-block">
                     <div class="code-label">200 OK <button class="copy-btn" onclick="copyBlock(this)">copy</button>
                     </div>
-                    <pre>GET /v1/transfers/trf_c3d4e5f6
-→ {
+                    <pre>{
   "id": "trf_c3d4e5f6",
   "status": "success",
   "amount": 500000,
-  "settlement_reference": "STL-1746091830000"
+  "settlement_reference": "STL-1746091830000",
+  "created_at": "2026-05-14T00:36:24.706Z"
 }</pre>
                 </div>
             </div>
@@ -1267,6 +1291,7 @@
         </div>
 
         <h2 class="section-title" id="wallet">Wallet Balance</h2>
+
         <div class="endpoint-card" id="wallet-card">
             <div class="endpoint-header" onclick="toggleEndpoint(this)">
                 <span class="method-badge get-badge">GET</span>
@@ -1275,22 +1300,38 @@
             </div>
             <div class="endpoint-body">
                 <p>Returns available and ledger balance for a given account in kobo.</p>
-                <div class="code-block">
-                    <div class="code-label">Request <button class="copy-btn" onclick="copyBlock(this)">copy</button>
-                    </div>
-                    <pre>GET /v1/wallet-balance?account_id=acc_111</pre>
-                </div>
+
+                <div class="subsection">Query parameters</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>account_id</code> <span style="color:var(--red);font-size:0.7rem;">REQUIRED</span>
+                            </td>
+                            <td>string</td>
+                            <td>The unique identifier of the account (must start with <code>acc_</code>).</td>
+                        </tr>
+                    </tbody>
+                </table>
+
                 <div class="code-block">
                     <div class="code-label">200 OK <button class="copy-btn" onclick="copyBlock(this)">copy</button>
                     </div>
                     <pre>{
-  "account_id":                 "acc_111",
-  "account_number":             "1029384756",
-  "currency":                   "NGN",
-  "available_balance":          9500000,
-  "ledger_balance":             9500000,
-  "available_balance_formatted": "NGN 95,000.00",
-  "queried_at":                 "2026-05-01T10:15:00Z"
+  "account_id": "acc_111",
+  "account_number": "1234567890",
+  "account_name": "Adeola Ogunlesi",
+  "currency": "NGN",
+  "available_balance": 10000000,
+  "ledger_balance": 10000000,
+  "available_balance_formatted": "NGN 100,000.00",
+  "queried_at": "2026-05-14T01:14:24.902Z"
 }</pre>
                 </div>
             </div>
@@ -1399,6 +1440,66 @@
                 btn.classList.add('copied');
                 setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
             });
+        }
+
+        function downloadPostman() {
+            const collection = {
+                "info": {
+                    "name": "Qore Integration Hub",
+                    "description": "Sandbox API for interbank & internal transfers, deterministic name enquiry, idempotent payments, and webhooks.",
+                    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+                },
+                "item": [
+                    {
+                        "name": "Customers",
+                        "item": [
+                            { "name": "Create Customer", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{test_api_key}}", "type": "text" }, { "key": "Idempotency-Key", "value": "{{$randomUUID}}", "type": "text" }, { "key": "Content-Type", "value": "application/json", "type": "text" }], "body": { "mode": "raw", "raw": "{\n  \"first_name\": \"Chidi\",\n  \"last_name\": \"Anya\",\n  \"phone_number\": \"+2348012345678\",\n  \"email\": \"chidi@example.com\",\n  \"date_of_birth\": \"1990-04-15\",\n  \"bvn\": \"22412345678\",\n  \"gender\": \"male\"\n}" }, "url": { "raw": "{{base_url}}/v1/customers", "host": ["{{base_url}}"], "path": ["v1", "customers"] } } },
+                            { "name": "List Customers", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{test_api_key}}", "type": "text" }], "url": { "raw": "{{base_url}}/v1/customers", "host": ["{{base_url}}"], "path": ["v1", "customers"] } } }
+                        ]
+                    },
+                    {
+                        "name": "Accounts",
+                        "item": [
+                            { "name": "Create Account", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{test_api_key}}", "type": "text" }, { "key": "Idempotency-Key", "value": "{{$randomUUID}}", "type": "text" }, { "key": "Content-Type", "value": "application/json", "type": "text" }], "body": { "mode": "raw", "raw": "{\n  \"customer_id\": \"cus_123e4567\",\n  \"product_code\": \"SAVINGS_BASIC\",\n  \"currency\": \"NGN\",\n  \"initial_deposit\": 0\n}" }, "url": { "raw": "{{base_url}}/v1/accounts", "host": ["{{base_url}}"], "path": ["v1", "accounts"] } } }
+                        ]
+                    },
+                    {
+                        "name": "Transfers",
+                        "item": [
+                            { "name": "Name Enquiry", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{test_api_key}}", "type": "text" }], "body": { "mode": "raw", "raw": "{\n  \"destination_bank_code\": \"044\",\n  \"destination_account_number\": \"1234567890\"\n}" }, "url": { "raw": "{{base_url}}/v1/transfers/name-enquiry", "host": ["{{base_url}}"], "path": ["v1", "transfers", "name-enquiry"] } } },
+                            { "name": "Interbank Transfer", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{test_api_key}}", "type": "text" }, { "key": "Idempotency-Key", "value": "{{$randomUUID}}", "type": "text" }, { "key": "Content-Type", "value": "application/json", "type": "text" }], "body": { "mode": "raw", "raw": "{\n  \"source_account_id\": \"acc_111\",\n  \"destination_bank_code\": \"044\",\n  \"destination_account_number\": \"1234567890\",\n  \"destination_account_name\": \"Adeola Ogunlesi\",\n  \"amount\": 500000,\n  \"currency\": \"NGN\",\n  \"narration\": \"Invoice #INV-001\"\n}" }, "url": { "raw": "{{base_url}}/v1/transfers", "host": ["{{base_url}}"], "path": ["v1", "transfers"] } } },
+                            { "name": "Internal Transfer", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{test_api_key}}", "type": "text" }, { "key": "Idempotency-Key", "value": "{{$randomUUID}}", "type": "text" }, { "key": "Content-Type", "value": "application/json", "type": "text" }], "body": { "mode": "raw", "raw": "{\n  \"source_account_id\": \"acc_111\",\n  \"destination_account_id\": \"acc_222\",\n  \"amount\": 250000,\n  \"currency\": \"NGN\",\n  \"narration\": \"Payment for goods\"\n}" }, "url": { "raw": "{{base_url}}/v1/transfers/internal", "host": ["{{base_url}}"], "path": ["v1", "transfers", "internal"] } } },
+                            { "name": "List Transfers", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{test_api_key}}", "type": "text" }], "url": { "raw": "{{base_url}}/v1/transfers", "host": ["{{base_url}}"], "path": ["v1", "transfers"] } } },
+                            { "name": "Get Transfer by ID", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{test_api_key}}", "type": "text" }], "url": { "raw": "{{base_url}}/v1/transfers/trf_111", "host": ["{{base_url}}"], "path": ["v1", "transfers", "trf_111"] } } }
+                        ]
+                    },
+                    {
+                        "name": "Wallet & Transactions",
+                        "item": [
+                            { "name": "Wallet Balance", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{test_api_key}}", "type": "text" }], "url": { "raw": "{{base_url}}/v1/wallet-balance?account_id=acc_111", "host": ["{{base_url}}"], "path": ["v1", "wallet-balance"], "query": [{ "key": "account_id", "value": "acc_111" }] } } },
+                            { "name": "Transaction History", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{test_api_key}}", "type": "text" }], "url": { "raw": "{{base_url}}/v1/transactions?account_id=acc_111", "host": ["{{base_url}}"], "path": ["v1", "transactions"], "query": [{ "key": "account_id", "value": "acc_111" }] } } }
+                        ]
+                    },
+                    {
+                        "name": "Banks",
+                        "item": [
+                            { "name": "List Banks", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{test_api_key}}", "type": "text" }], "url": { "raw": "{{base_url}}/v1/banks", "host": ["{{base_url}}"], "path": ["v1", "banks"] } } }
+                        ]
+                    }
+                ],
+                "variable": [
+                    { "key": "base_url", "value": "https://qore-demo.vercel.app", "type": "string" },
+                    { "key": "test_api_key", "value": "sk_test_demo123abc", "type": "string" }
+                ]
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(collection, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "Qore_Integration_Hub.postman_collection.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
         }
     </script>
 </body>

@@ -9,6 +9,19 @@ const app = express();
 try {
     app.use(cors());
     app.use(bodyParser.json());
+
+    app.use((err, req, res, next) => {
+        if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+            return res.status(400).json({
+                type: "https://api.qore.dev/errors/bad-json",
+                title: "Invalid JSON Format",
+                status: 400,
+                detail: "The JSON payload you sent is malformed. Please check for missing double quotes around property names or trailing commas."
+            });
+        }
+        next();
+    });
+
     app.use(express.urlencoded({ extended: true }));
     app.set('view engine', 'ejs');
 
