@@ -109,7 +109,25 @@ async function getOrCreateAccountName(bankCode, accountNumber) {
     return accountName;
 }
 
-async function getCustomers(filters = {}) {
+async function getCustomers(filters = {}, pagination = {}) {
+    const { page = 1, limit = 50 } = pagination;
+    const offset = (page - 1) * limit;
+    const cacheKey = `customers_${JSON.stringify(filters)}_${page}_${limit}`;
+    let cached = cache.get(cacheKey);
+    if (cached) return cached;
+
+    let query = supabase.from('customers').select('*');
+    if (filters.email) query = query.eq('email', filters.email);
+    if (filters.phone) query = query.eq('phone_number', filters.phone);
+    // order descending by created_at
+    query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1);
+
+    const { data, error, count } = await query;
+
+    if (error) throw error;
+    cache.set(cacheKey, data || []);
+    return data || [];
+}
     const cacheKey = `customers_${JSON.stringify(filters)}`;
     let cached = cache.get(cacheKey);
     if (cached) return cached;
