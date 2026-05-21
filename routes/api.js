@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const { v4: uuidv4 } = require('uuid');
 const { getAIHint } = require('../services/aiService');
 const { fireWebhook } = require('../services/webhookService');
+const supabase = require('../data/supabaseClient');
 const {
     getCustomers, createCustomer, getCustomerById,
     getAccounts, createAccount, getAccountById, updateAccountStatus,
@@ -161,12 +162,23 @@ router.get('/customers', async (req, res) => {
     const auth = await authenticate(req);
     if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Invalid API key');
 
-    const filters = {};
-    if (req.query.email) filters.email = req.query.email;
-    if (req.query.phone) filters.phone = req.query.phone;
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50));
+    const from  = (page - 1) * limit;
+    const to    = from + limit - 1;
 
-    const data = await getCustomers(filters);
-    res.json({ data, meta: { total_count: data.length, has_more: false } });
+    let query = supabase.from('customers').select('*', { count: 'exact' });
+    if (req.query.email) query = query.eq('email', req.query.email);
+    if (req.query.phone) query = query.eq('phone_number', req.query.phone);
+    query = query.order('created_at', { ascending: false }).range(from, to);
+
+    const { data, count, error } = await query;
+    if (error) return sendError(req, res, 500, 'internal-error', 'Internal Server Error', 'Failed to fetch customers');
+
+    return res.json({
+        data: data || [],
+        meta: { total_count: count, page, limit, has_more: (page * limit) < count }
+    });
 });
 
 // ========== ACCOUNTS ==========
@@ -409,12 +421,23 @@ router.get('/transfers', async (req, res) => {
     const auth = await authenticate(req);
     if (!auth) return sendError(req, res, 401, 'unauthorized', 'Unauthorized', 'Invalid API key');
 
-    const filters = {};
-    if (req.query.account_id) filters.source_account_id = req.query.account_id;
-    if (req.query.status) filters.status = req.query.status;
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50));
+    const from  = (page - 1) * limit;
+    const to    = from + limit - 1;
 
-    const data = await getTransfers(filters);
-    res.json({ data, meta: { total_count: data.length, has_more: false } });
+    let query = supabase.from('transfers').select('*', { count: 'exact' });
+    if (req.query.account_id) query = query.eq('source_account_id', req.query.account_id);
+    if (req.query.status)     query = query.eq('status', req.query.status);
+    query = query.order('created_at', { ascending: false }).range(from, to);
+
+    const { data, count, error } = await query;
+    if (error) return sendError(req, res, 500, 'internal-error', 'Internal Server Error', 'Failed to fetch transfers');
+
+    return res.json({
+        data: data || [],
+        meta: { total_count: count, page, limit, has_more: (page * limit) < count }
+    });
 });
 
 router.get('/transfers/:id', async (req, res) => {
@@ -584,13 +607,19 @@ router.get('/transactions', async (req, res) => {
         return sendError(req, res, 400, 'invalid-request', 'Invalid Request', 'account_id must start with acc_ (e.g., acc_12345678)');
     }
 
-    const { data, error } = await require('../data/supabaseClient')
-        .from('transfers')
-        .select('*')
-        .or(`source_account_id.eq.${account_id},destination_account_id.eq.${account_id}`)
-        .order('created_at', { ascending: false });
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50));
+    const from  = (page - 1) * limit;
+    const to    = from + limit - 1;
 
-    if (error) throw error;
+    const { data, count, error } = await supabase
+        .from('transfers')
+        .select('*', { count: 'exact' })
+        .or(`source_account_id.eq.${account_id},destination_account_id.eq.${account_id}`)
+        .order('created_at', { ascending: false })
+        .range(from, to);
+
+    if (error) return sendError(req, res, 500, 'internal-error', 'Internal Server Error', 'Failed to fetch transactions');
 
     const enriched = await Promise.all((data || []).map(async t => {
         let destName = t.destination_account_name;
@@ -618,7 +647,7 @@ router.get('/transactions', async (req, res) => {
         };
     }));
 
-    res.json({ data: enriched, meta: { total_count: enriched.length, has_more: false } });
+    res.json({ data: enriched, meta: { total_count: count, page, limit, has_more: (page * limit) < count } });
 });
 
 module.exports = router;
