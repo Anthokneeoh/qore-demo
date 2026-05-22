@@ -2,13 +2,14 @@ const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const cookieParser = require('cookie-parser');
+const supabase = require('../data/supabaseClient');
 
 const {
     getApiKeys,
+    updateApiKey,
     getWebhookUrl,
     setWebhookUrl
 } = require('../data/mockDb');
-const supabase = require('../data/supabaseClient');
 const { deliveryLog, resendWebhook } = require('../services/webhookService');
 
 // Middleware Setup
@@ -92,7 +93,6 @@ router.get('/', isDemoAuth, async (req, res) => {
             .order('created_at', { ascending: false })
             .range(tFrom, tTo);
 
-        // Fetch core session-specific data
         const apiKeys = await getApiKeys(sessionId);
         const webhookUrl = await getWebhookUrl(sessionId);
 
@@ -171,8 +171,5 @@ router.post('/resend-webhook/:webhookId', isDemoAuth, async (req, res) => {
         res.redirect('/dashboard?tab=webhooks&error=resend_failed');
     }
 });
-
-// Import updateApiKey from mockDb for generate-key route
-const { updateApiKey } = require('../data/mockDb');
 
 module.exports = router;
