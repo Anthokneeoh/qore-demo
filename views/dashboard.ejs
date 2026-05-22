@@ -452,6 +452,36 @@
             text-align: center;
         }
 
+        /* Pagination controls */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.75rem 1.1rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg);
+            border-radius: 0 0 8px 8px;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+        .pagination-bar form { display: inline-flex; align-items: center; gap: 0.4rem; }
+        .pagination-bar select {
+            border: 1px solid var(--border); border-radius: 5px;
+            padding: 0.25rem 0.5rem; font-size: 0.78rem;
+            background: var(--card); color: var(--text); cursor: pointer;
+        }
+        .pagination-bar .page-info { font-size: 0.78rem; color: var(--muted); }
+        .pagination-nav { display: inline-flex; gap: 0.3rem; }
+        .pagination-nav button {
+            padding: 0.25rem 0.65rem; border-radius: 5px; font-size: 0.78rem;
+            font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+            background: var(--card); color: var(--text); transition: all 0.15s;
+        }
+        .pagination-nav button:hover:not(:disabled) { background: var(--green-lt); border-color: var(--green); color: var(--green); }
+        .pagination-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+
         @media (max-width: 768px) {
             .topbar {
                 padding: 0 1rem;
@@ -530,6 +560,12 @@
 
             .btn-sm {
                 padding: 0.3rem 0.6rem;
+            }
+
+            .pagination-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
             }
         }
     </style>
@@ -708,6 +744,28 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="pagination-bar">
+                        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+                            <span class="page-info">
+                                Showing <%= ((cPage-1)*cLimit)+1 %> – <%= Math.min(cPage*cLimit, cCount) %> of <%= cCount %> customers
+                            </span>
+                            <form onsubmit="event.preventDefault(); goToPage('cpage','climit',1,this.climit.value)">
+                                <label style="font-size:0.78rem">Per page:</label>
+                                <select name="climit" onchange="goToPage('cpage','climit',1,this.value)">
+                                    <option value="20"  <%= cLimit==20  ? 'selected' : '' %>>20</option>
+                                    <option value="50"  <%= cLimit==50  ? 'selected' : '' %>>50</option>
+                                    <option value="100" <%= cLimit==100 ? 'selected' : '' %>>100</option>
+                                </select>
+                            </form>
+                        </div>
+                        <div class="pagination-nav">
+                            <button onclick="goToPage('cpage','climit',<%= cPage-1 %>,<%= cLimit %>)"
+                                <%= cPage <= 1 ? 'disabled' : '' %>>← Prev</button>
+                            <span class="page-info" style="padding:0.25rem 0.5rem">Page <%= cPage %> of <%= Math.max(1, Math.ceil(cCount/cLimit)) %></span>
+                            <button onclick="goToPage('cpage','climit',<%= cPage+1 %>,<%= cLimit %>)"
+                                <%= (cPage * cLimit) >= cCount ? 'disabled' : '' %>>Next →</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -764,6 +822,28 @@
                                     <% }) %>
                             </tbody>
                         </table>
+                    </div>
+                    <div class="pagination-bar">
+                        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+                            <span class="page-info">
+                                Showing <%= ((aPage-1)*aLimit)+1 %> – <%= Math.min(aPage*aLimit, aCount) %> of <%= aCount %> accounts
+                            </span>
+                            <form onsubmit="event.preventDefault(); goToPage('apage','alimit',1,this.alimit.value)">
+                                <label style="font-size:0.78rem">Per page:</label>
+                                <select name="alimit" onchange="goToPage('apage','alimit',1,this.value)">
+                                    <option value="20"  <%= aLimit==20  ? 'selected' : '' %>>20</option>
+                                    <option value="50"  <%= aLimit==50  ? 'selected' : '' %>>50</option>
+                                    <option value="100" <%= aLimit==100 ? 'selected' : '' %>>100</option>
+                                </select>
+                            </form>
+                        </div>
+                        <div class="pagination-nav">
+                            <button onclick="goToPage('apage','alimit',<%= aPage-1 %>,<%= aLimit %>)"
+                                <%= aPage <= 1 ? 'disabled' : '' %>>← Prev</button>
+                            <span class="page-info" style="padding:0.25rem 0.5rem">Page <%= aPage %> of <%= Math.max(1, Math.ceil(aCount/aLimit)) %></span>
+                            <button onclick="goToPage('apage','alimit',<%= aPage+1 %>,<%= aLimit %>)"
+                                <%= (aPage * aLimit) >= aCount ? 'disabled' : '' %>>Next →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -866,6 +946,28 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="pagination-bar">
+                        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+                            <span class="page-info">
+                                Showing <%= ((tPage-1)*tLimit)+1 %> – <%= Math.min(tPage*tLimit, tCount) %> of <%= tCount %> transactions
+                            </span>
+                            <form onsubmit="event.preventDefault(); goToPage('tpage','tlimit',1,this.tlimit.value)">
+                                <label style="font-size:0.78rem">Per page:</label>
+                                <select name="tlimit" onchange="goToPage('tpage','tlimit',1,this.value)">
+                                    <option value="20"  <%= tLimit==20  ? 'selected' : '' %>>20</option>
+                                    <option value="50"  <%= tLimit==50  ? 'selected' : '' %>>50</option>
+                                    <option value="100" <%= tLimit==100 ? 'selected' : '' %>>100</option>
+                                </select>
+                            </form>
+                        </div>
+                        <div class="pagination-nav">
+                            <button onclick="goToPage('tpage','tlimit',<%= tPage-1 %>,<%= tLimit %>)"
+                                <%= tPage <= 1 ? 'disabled' : '' %>>← Prev</button>
+                            <span class="page-info" style="padding:0.25rem 0.5rem">Page <%= tPage %> of <%= Math.max(1, Math.ceil(tCount/tLimit)) %></span>
+                            <button onclick="goToPage('tpage','tlimit',<%= tPage+1 %>,<%= tLimit %>)"
+                                <%= (tPage * tLimit) >= tCount ? 'disabled' : '' %>>Next →</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -910,7 +1012,7 @@
                     <div class="feedback feedback-ok">✓ Webhook URL saved successfully.</div>
                     <% } %>
                         <% if (typeof query !=='undefined' && query.resent) { %>
-                            <div class="feedback feedback-ok">✓ Webhook payload resent successfully.</div>
+                            <div class="feedback feedback-ok">��� Webhook payload resent successfully.</div>
                             <% } %>
                                 <% if (typeof query !=='undefined' && query.error==='invalid_url' ) { %>
                                     <div class="feedback feedback-err">✗ Invalid URL — must start with http:// or
@@ -1014,156 +1116,94 @@
         </main>
     </div>
 
-    <dialog id="txModal">
+    <dialog id="txModal" class="transaction-modal">
         <div class="modal-header">
-            <h3 style="font-size: 1rem; font-weight: 700; margin: 0;">Transaction Details</h3>
-            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('txModal').close()"
-                style="border:none; font-size: 1.2rem;">✕</button>
+            <h2>Transaction Details</h2>
+            <button type="button" onclick="this.closest('dialog').close()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">✕</button>
         </div>
         <div class="modal-body">
             <div class="detail-row">
-                <span class="detail-label">Transfer ID</span>
-                <span class="detail-value mono" id="modalId"></span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Status</span>
-                <span class="detail-value" id="modalStatusContainer"></span>
+                <span class="detail-label">Transaction ID</span>
+                <span class="detail-value mono" id="modal-id"></span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Amount</span>
-                <span class="detail-value mono" id="modalAmount"></span>
+                <span class="detail-value" id="modal-amount"></span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Source Bank</span>
-                <span class="detail-value">Qore Bank</span>
+                <span class="detail-label">Destination</span>
+                <span class="detail-value mono" id="modal-destination"></span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Source Account ID</span>
-                <span class="detail-value mono" id="modalSource"></span>
+                <span class="detail-label">Bank</span>
+                <span class="detail-value" id="modal-bank"></span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Destination Bank</span>
-                <span class="detail-value mono" id="modalBank"></span>
+                <span class="detail-label">Status</span>
+                <span class="detail-value" id="modal-status"></span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Destination Account</span>
-                <span class="detail-value mono" id="modalDestAcct"></span>
+                <span class="detail-label">Reference</span>
+                <span class="detail-value mono" id="modal-reference"></span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Destination Name</span>
-                <span class="detail-value" id="modalDestName"></span>
-            </div>
-            <div class="detail-row" style="border:none; padding-bottom:0;">
-                <span class="detail-label">Narration</span>
-                <span class="detail-value" id="modalNarration"></span>
+                <span class="detail-label">Initiated</span>
+                <span class="detail-value" id="modal-date"></span>
             </div>
         </div>
     </dialog>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const targetTab = urlParams.get('tab');
+        function toggleMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('open');
+        }
 
-            if (targetTab) {
-                const navItem = document.querySelector(`.nav-item[data-tab="${targetTab}"]`);
-                if (navItem) {
-                    showSection(targetTab, navItem);
-                }
-            }
+        function showSection(section, elem) {
+            document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
+            document.getElementById(`section-${section}`).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            elem.classList.add('active');
+        }
 
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    try {
-                        const tx = JSON.parse(decodeURIComponent(btn.dataset.tx));
-                        openTxModal(tx);
-                    } catch (e) {
-                        console.error('Invalid transaction data', e);
-                    }
-                });
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const tx = JSON.parse(decodeURIComponent(this.dataset.tx));
+                const modal = document.getElementById('txModal');
+
+                document.getElementById('modal-id').textContent = tx.id;
+                document.getElementById('modal-amount').textContent = 'NGN ' + (tx.amount / 100).toLocaleString('en-NG', { minimumFractionDigits: 2 });
+                document.getElementById('modal-destination').textContent = tx._resolvedName || tx.destination_account_number || tx.destination_account_id || 'Unknown';
+                document.getElementById('modal-bank').textContent = tx._resolvedBank || tx.destination_bank_name || tx.destination_bank_code || 'Unknown Bank';
+                document.getElementById('modal-status').innerHTML = '<span class="status-pill s-' + tx.status + '">' + tx.status + '</span>';
+                document.getElementById('modal-reference').textContent = tx.reference || 'N/A';
+                document.getElementById('modal-date').textContent = new Date(tx.created_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                modal.showModal();
             });
         });
 
-        function toggleMenu() {
-            document.querySelector('.sidebar').classList.toggle('open');
-        }
-
-        function showSection(name, element) {
-            const target = document.getElementById('section-' + name);
-            if (!target) {
-                console.error('Missing section:', name);
-                return;
-            }
-            document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
-            target.style.display = 'block';
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            if (element) element.classList.add('active');
-            if (window.innerWidth <= 768) {
-                document.querySelector('.sidebar').classList.remove('open');
-            }
-            const cleanUrl = window.location.pathname + '?tab=' + name;
-            window.history.replaceState(null, '', cleanUrl);
-        }
-
-        function openTxModal(tx) {
-            document.getElementById('modalId').textContent = tx.id;
-
-            const statusSpan = document.createElement('span');
-            statusSpan.className = `status-pill s-${tx.status}`;
-            statusSpan.textContent = tx.status;
-            const statusContainer = document.getElementById('modalStatusContainer');
-            statusContainer.innerHTML = '';
-            statusContainer.appendChild(statusSpan);
-
-            document.getElementById('modalAmount').textContent = `NGN ${(tx.amount / 100).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
-            document.getElementById('modalSource').textContent = tx.source_account_id || '–';
-
-            let destBank = tx._resolvedBank || tx.destination_bank;
-            if (!destBank && tx.destination_bank_code) {
-                const bankMap = {
-                    '044': 'Access Bank',
-                    '011': 'First Bank of Nigeria',
-                    '058': 'GTBank',
-                    '033': 'UBA',
-                    '050': 'Ecobank Nigeria'
-                };
-                destBank = bankMap[tx.destination_bank_code] || tx.destination_bank_code;
-            }
-            document.getElementById('modalBank').textContent = destBank || '–';
-
-            const destDisplay = tx.destination_account_number || tx.destination_account_id || '–';
-            document.getElementById('modalDestAcct').textContent = destDisplay;
-
-            document.getElementById('modalDestName').textContent = tx._resolvedName || tx.destination_account_name || tx.destination_customer_name || '–';
-
-            document.getElementById('modalNarration').textContent = tx.narration || '–';
-
-            document.getElementById('txModal').showModal();
-        }
-
         function copyKey(type, btn) {
-            const input = document.getElementById('key-' + type);
-            navigator.clipboard.writeText(input.value)
-                .then(() => {
-                    btn.textContent = 'copied!';
-                    setTimeout(() => btn.textContent = 'copy', 2000);
-                })
-                .catch(() => alert('Copy failed. Please copy manually.'));
+            const input = document.getElementById(`key-${type}`);
+            input.select();
+            document.execCommand('copy');
+            btn.textContent = '✓ Copied';
+            setTimeout(() => { btn.textContent = 'copy'; }, 1500);
         }
 
         function copyWebhookUrl(btn) {
             const input = document.querySelector('.webhook-input');
-            const feedback = document.getElementById('webhook-copy-feedback');
-            navigator.clipboard.writeText(input.value)
-                .then(() => {
-                    btn.textContent = 'Copied!';
-                    if (feedback) feedback.style.display = 'block';
-                    setTimeout(() => {
-                        btn.textContent = 'Copy';
-                        if (feedback) feedback.style.display = 'none';
-                    }, 2000);
-                })
-                .catch(() => alert('Copy failed. Please copy manually.'));
+            input.select();
+            document.execCommand('copy');
+            document.getElementById('webhook-copy-feedback').style.display = 'block';
+            setTimeout(() => { document.getElementById('webhook-copy-feedback').style.display = 'none'; }, 2000);
+        }
+
+        function goToPage(pageParam, limitParam, pageVal, limitVal) {
+            const url = new URL(window.location.href);
+            url.searchParams.set(pageParam, pageVal);
+            url.searchParams.set(limitParam, limitVal);
+            window.location.href = url.toString();
         }
     </script>
 </body>
