@@ -4,14 +4,11 @@ const { v4: uuidv4 } = require('uuid');
 const cookieParser = require('cookie-parser');
 
 const {
-    getCustomers,
-    getAccounts,
-    getTransfers,
     getApiKeys,
-    updateApiKey,
     getWebhookUrl,
     setWebhookUrl
 } = require('../data/mockDb');
+const supabase = require('../data/supabaseClient');
 const { deliveryLog, resendWebhook } = require('../services/webhookService');
 
 // Middleware Setup
@@ -59,10 +56,43 @@ router.get('/', isDemoAuth, async (req, res) => {
     try {
         const sessionId = req.cookies.session_id;
 
-        // Fetch core data
-        const customers = await getCustomers();
-        const accounts = await getAccounts();
-        const transfers = await getTransfers();
+        // Customers pagination
+        const cPage  = Math.max(1, parseInt(req.query.cpage)  || 1);
+        const cLimit = Math.min(100, Math.max(1, parseInt(req.query.climit) || 20));
+        const cFrom  = (cPage - 1) * cLimit;
+        const cTo    = cFrom + cLimit - 1;
+
+        const { data: customers, count: cCount } = await supabase
+            .from('customers')
+            .select('*', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .range(cFrom, cTo);
+
+        // Accounts pagination
+        const aPage  = Math.max(1, parseInt(req.query.apage)  || 1);
+        const aLimit = Math.min(100, Math.max(1, parseInt(req.query.alimit) || 20));
+        const aFrom  = (aPage - 1) * aLimit;
+        const aTo    = aFrom + aLimit - 1;
+
+        const { data: accounts, count: aCount } = await supabase
+            .from('accounts')
+            .select('*', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .range(aFrom, aTo);
+
+        // Transfers pagination
+        const tPage  = Math.max(1, parseInt(req.query.tpage)  || 1);
+        const tLimit = Math.min(100, Math.max(1, parseInt(req.query.tlimit) || 20));
+        const tFrom  = (tPage - 1) * tLimit;
+        const tTo    = tFrom + tLimit - 1;
+
+        const { data: transfers, count: tCount } = await supabase
+            .from('transfers')
+            .select('*', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .range(tFrom, tTo);
+
+        // Fetch core session-specific data
         const apiKeys = await getApiKeys(sessionId);
         const webhookUrl = await getWebhookUrl(sessionId);
 
@@ -73,12 +103,17 @@ router.get('/', isDemoAuth, async (req, res) => {
             .reverse();
 
         res.render('dashboard', {
-            customers,
-            accounts,
-            transfers,
+            customers:   customers || [],
+            accounts:    accounts  || [],
+            transfers:   transfers || [],
             apiKeys,
-            webhookUrl: webhookUrl || '',
-            webhookLog: safeWebhookLog,
+            webhookUrl:  webhookUrl || '',
+            webhookLog:  safeWebhookLog,
+            // pagination metadata
+            cPage, cLimit, cCount: cCount || 0,
+            aPage, aLimit, aCount: aCount || 0,
+            tPage, tLimit, tCount: tCount || 0,
+            // pass current query string through for page navigation links
             query: req.query
         });
     } catch (err) {
@@ -136,5 +171,8 @@ router.post('/resend-webhook/:webhookId', isDemoAuth, async (req, res) => {
         res.redirect('/dashboard?tab=webhooks&error=resend_failed');
     }
 });
+
+// Import updateApiKey from mockDb for generate-key route
+const { updateApiKey } = require('../data/mockDb');
 
 module.exports = router;
