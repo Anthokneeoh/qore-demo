@@ -645,7 +645,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% transfers.slice(-5).reverse().forEach((t, index)=> {
+                                <% transfers.slice(0, 5).forEach((t, index)=> {
                                     let destName = t.destination_customer_name || t.destination_account_name;
                                     if (!destName && t.destination_account_id) {
                                     const acct = accounts.find(a => a.id === t.destination_account_id);
@@ -1012,7 +1012,7 @@
                     <div class="feedback feedback-ok">✓ Webhook URL saved successfully.</div>
                     <% } %>
                         <% if (typeof query !=='undefined' && query.resent) { %>
-                            <div class="feedback feedback-ok">��� Webhook payload resent successfully.</div>
+                            <div class="feedback feedback-ok">✓ Webhook payload resent successfully.</div>
                             <% } %>
                                 <% if (typeof query !=='undefined' && query.error==='invalid_url' ) { %>
                                     <div class="feedback feedback-err">✗ Invalid URL — must start with http:// or
@@ -1159,11 +1159,27 @@
             sidebar.classList.toggle('open');
         }
 
-        function showSection(section, elem) {
+        function showSection(name, el) {
             document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
-            document.getElementById(`section-${section}`).style.display = 'block';
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            elem.classList.add('active');
+            document.getElementById('section-' + name).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (el) el.classList.add('active');
+            // Update URL with active section without triggering a reload
+            const url = new URL(window.location.href);
+            url.searchParams.set('section', name);
+            window.history.replaceState({}, '', url.toString());
+        }
+
+        function goToPage(pageParam, limitParam, pageVal, limitVal) {
+            const url = new URL(window.location.href);
+            url.searchParams.set(pageParam, pageVal);
+            url.searchParams.set(limitParam, limitVal);
+            // Preserve which section is currently visible
+            const activeSection = document.querySelector('[id^="section-"][style*="block"]');
+            if (activeSection) {
+                url.searchParams.set('section', activeSection.id.replace('section-', ''));
+            }
+            window.location.href = url.toString();
         }
 
         document.querySelectorAll('.view-btn').forEach(btn => {
@@ -1199,12 +1215,13 @@
             setTimeout(() => { document.getElementById('webhook-copy-feedback').style.display = 'none'; }, 2000);
         }
 
-        function goToPage(pageParam, limitParam, pageVal, limitVal) {
-            const url = new URL(window.location.href);
-            url.searchParams.set(pageParam, pageVal);
-            url.searchParams.set(limitParam, limitVal);
-            window.location.href = url.toString();
-        }
+        // On page load, restore the active section from URL param
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const section = params.get('section') || 'overview';
+            const navEl = document.querySelector('.nav-item[onclick*="' + section + '"]');
+            showSection(section, navEl);
+        })();
     </script>
 </body>
 
